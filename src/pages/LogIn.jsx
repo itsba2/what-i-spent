@@ -1,122 +1,192 @@
-// library imports
+import { useForm, Controller } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import zod from "zod"
+import {
+    Box,
+    TextField,
+    Button,
+    useMediaQuery,
+    Alert,
+    Card,
+    CardHeader,
+    CardContent,
+    CardActions,
+    ButtonGroup,
+    Snackbar,
+    Slide,
+} from "@mui/material"
+import { Login, LockReset, PersonAdd } from "@mui/icons-material"
+import { useTheme } from "@mui/material/styles"
 import { useEffect, useState } from "react"
-import { Link, useLocation, useNavigate } from "react-router-dom"
-import { useForm } from "react-hook-form"
-
-// imports from files
-import Button from "../components/Button"
-import Input from "../components/Input"
+import { resolveFirebaseError } from "../helpers/helpers"
 import { useAuth } from "../auth/AuthProvider"
-import AuthError from "../auth/AuthError"
+import { useNavigate } from "react-router-dom"
 
-const initialError = { code: "", show: false }
+const defaultValues = {
+    email: "",
+    password: "",
+    confirm: "",
+    username: "",
+}
+
+const initialFbError = { code: "", show: false }
 
 const LogIn = () => {
     const { logIn, currentUser } = useAuth()
     const navigate = useNavigate()
-    const location = useLocation()
-    const from = location.state?.from?.pathname || "/"
 
     useEffect(() => {
-        if (currentUser) navigate(from, { replace: true })
+        if (currentUser) navigate("/", { replace: true })
     }, [currentUser])
 
-    const [error, setError] = useState(initialError)
+    const [fbError, setFbError] = useState(initialFbError)
+
+    const theme = useTheme()
+    const mobileView = useMediaQuery(theme.breakpoints.down("sm"))
+    const largeView = useMediaQuery(theme.breakpoints.up("lg"))
+
+    const formSchema = zod.object({
+        email: zod.string().min(1, "Email is required").email(),
+        password: zod.string().min(1, "Password is required"),
+    })
+
     const {
         handleSubmit,
+        control,
         formState: { errors },
-        register,
-        trigger,
-    } = useForm()
-
+    } = useForm({
+        resolver: zodResolver(formSchema),
+        mode: "all",
+        defaultValues,
+    })
     const onSubmit = async (data) => {
-        setError(initialError)
+        setFbError(initialFbError)
         try {
-            await logIn(data.email, data.password)
+            await logIn(data.email, data.password, data.username)
         } catch (error) {
-            setError({ code: error.code, show: true })
+            setFbError({ code: error.code, show: true })
         }
     }
 
+    const handleCloseAlert = (event, reason) => {
+        if (reason === "clickaway") return
+        setFbError((prev) => ({ ...prev, show: false }))
+    }
+
     return (
-        <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex w-full flex-col items-center gap-4 sm:w-3/4 md:w-1/2 lg:w-1/4"
-            autoComplete="new-password"
+        <Card
+            elevation={1}
+            sx={{
+                paddingY: 4,
+                maxWidth: 550,
+                width: mobileView ? "100%" : largeView ? "35%" : "50%",
+            }}
         >
-            <Input
-                type="email"
-                name="email"
-                id="email"
-                label="Email"
-                register={{
-                    ...register("email", {
-                        required: {
-                            value: true,
-                            message: "Email is required!",
-                        },
-                        pattern: {
-                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                            message: "Invalid email address!",
-                        },
-                    }),
-                }}
-                onKeyUp={() => {
-                    trigger("email")
-                }}
-                error={errors.email}
-                autoFocus={true}
-            />
-            <Input
-                type="password"
-                name="password"
-                id="password"
-                label="Password"
-                register={{
-                    ...register("password", {
-                        required: {
-                            value: true,
-                            message: "Password is required!",
-                        },
-                    }),
-                }}
-                onKeyUp={() => {
-                    trigger("password")
-                }}
-                error={errors.password}
-            />
-            <Button
-                type="submit"
-                disabled={Object.keys(errors).length}
-                text="Log In"
-                fullWidth={true}
-            />
-            {error.show && <AuthError code={error.code} />}
-            <div className="text-start">
-                <p className="text-lg">
-                    Forgot your password?{" "}
-                    <Link
-                        className="text-primary dark:text-primaryDark"
-                        to="/reset-password"
+            <CardHeader title="Log In" />
+            <CardContent>
+                <Box
+                    component="form"
+                    noValidate
+                    autoComplete="off"
+                    sx={{
+                        paddingY: 4,
+                        display: "flex",
+                        flexDirection: "column",
+
+                        gap: 2,
+                    }}
+                    onSubmit={handleSubmit(onSubmit)}
+                >
+                    <Controller
+                        name="email"
+                        control={control}
+                        render={({ field }) => (
+                            <TextField
+                                {...field}
+                                variant="standard"
+                                required
+                                label="Email"
+                                error={!!errors.email}
+                                helperText={
+                                    errors.email ? errors?.email.message : ""
+                                }
+                            />
+                        )}
+                    ></Controller>
+                    <Controller
+                        name="password"
+                        control={control}
+                        render={({ field }) => (
+                            <TextField
+                                {...field}
+                                variant="standard"
+                                type="password"
+                                required
+                                label="Password"
+                                error={!!errors.password}
+                                helperText={
+                                    errors.password
+                                        ? errors?.password.message
+                                        : ""
+                                }
+                            />
+                        )}
+                    ></Controller>
+
+                    <Button
+                        variant="contained"
+                        startIcon={<Login />}
+                        type="submit"
+                        sx={{
+                            alignSelf: "center",
+                            width: "fit-content",
+                        }}
                     >
-                        <span className="inline-block hover:underline">
-                            Reset password
-                        </span>
-                    </Link>
-                </p>
-                <p className="text-lg">
-                    You don't have an account?{" "}
-                    <Link
-                        className="text-primary dark:text-primaryDark"
-                        to="/register"
+                        Log In
+                    </Button>
+                </Box>
+            </CardContent>
+            <CardActions>
+                <ButtonGroup
+                    fullWidth
+                    variant="text"
+                >
+                    <Button
+                        startIcon={<LockReset />}
+                        href="/reset-password"
+                        // onClick={() => navigate("/reset-password")}
                     >
-                        <span className="inline-block hover:underline">
-                            Register
-                        </span>
-                    </Link>
-                </p>
-            </div>
-        </form>
+                        Reset Password
+                    </Button>
+                    <Button
+                        startIcon={<PersonAdd />}
+                        href="/register"
+                        // onClick={() => navigate("/register")}
+                    >
+                        Create Account
+                    </Button>
+                </ButtonGroup>
+            </CardActions>
+            <Snackbar
+                TransitionComponent={(props) => (
+                    <Slide
+                        {...props}
+                        direction="right"
+                    />
+                )}
+                open={fbError.show}
+                autoHideDuration={4000}
+                onClose={handleCloseAlert}
+            >
+                <Alert
+                    severity="error"
+                    onClose={handleCloseAlert}
+                    sx={{ width: "100%" }}
+                >
+                    {resolveFirebaseError(fbError.code)}
+                </Alert>
+            </Snackbar>
+        </Card>
     )
 }
 

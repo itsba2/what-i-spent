@@ -1,15 +1,34 @@
-// library imports
+import { useForm, Controller } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import zod from "zod"
+import {
+    Box,
+    TextField,
+    Button,
+    useMediaQuery,
+    Alert,
+    Card,
+    CardHeader,
+    CardContent,
+    CardActions,
+    ButtonGroup,
+    Snackbar,
+} from "@mui/material"
+import { PersonAdd, Login } from "@mui/icons-material"
+import { useTheme } from "@mui/material/styles"
 import { useEffect, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { useForm } from "react-hook-form"
-
-// imports from files
-import Button from "../components/Button"
-import Input from "../components/Input"
+import { resolveFirebaseError } from "../helpers/helpers"
 import { useAuth } from "../auth/AuthProvider"
-import AuthError from "../auth/AuthError"
+import { useNavigate } from "react-router-dom"
 
-const initialError = { code: "", show: false }
+const defaultValues = {
+    email: "",
+    password: "",
+    confirm: "",
+    username: "",
+}
+
+const initialFbError = { code: "", show: false }
 
 const Register = () => {
     const { createUser, currentUser } = useAuth()
@@ -19,149 +38,209 @@ const Register = () => {
         if (currentUser) navigate("/", { replace: true })
     }, [currentUser])
 
+    const [fbError, setFbError] = useState(initialFbError)
+    // const [success, setSuccess] = useState(false)
+
+    const theme = useTheme()
+    const mobileView = useMediaQuery(theme.breakpoints.down("sm"))
+    const largeView = useMediaQuery(theme.breakpoints.up("lg"))
+
+    const formSchema = zod
+        .object({
+            email: zod.string().min(1, "Email is required").email(),
+            password: zod
+                .string()
+                .min(1, "Password is required")
+                .min(6, "Password must contain at least 6 characters"),
+            confirm: zod.string().min(1, "Confirm password"),
+            username: zod.string().min(1, "Username is required"),
+        })
+        .superRefine(({ password, confirm, username }, ctx) => {
+            if (confirm !== password) {
+                ctx.addIssue({
+                    code: "custom",
+                    message: "Password does not match",
+                    path: ["confirm"],
+                })
+            }
+            if (!username.charAt(0).match(/[a-z]/i)) {
+                ctx.addIssue({
+                    code: "custom",
+                    message: "Username must start with letter",
+                    path: ["username"],
+                })
+            }
+            if (username.length < 5) {
+                ctx.addIssue({
+                    code: "custom",
+                    message: "Username must contain at least 5 letters",
+                    path: ["username"],
+                })
+            }
+        })
+
     const {
         handleSubmit,
+        control,
         formState: { errors },
-        register,
-        trigger,
-        watch,
-    } = useForm()
-
-    const [error, setError] = useState(initialError)
+    } = useForm({
+        resolver: zodResolver(formSchema),
+        mode: "all",
+        defaultValues,
+    })
 
     const onSubmit = async (data) => {
-        setError(initialError)
+        // console.log(data)
+        setFbError(initialFbError)
         try {
             await createUser(data.email, data.password, data.username)
+            // setSuccess(true)
         } catch (error) {
-            setError({ code: error.code, show: true })
+            console.log(error.code)
+            setFbError({ code: error.code, show: true })
         }
     }
 
+    // const handleCloseAlert = (event, reason) => {
+    //     if (reason === "clickaway") return
+    //     setSuccess(false)
+    // }
+
     return (
-        <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex w-full flex-col items-center gap-4 sm:w-3/4 md:w-1/2 lg:w-1/4"
+        <Card
+            elevation={1}
+            sx={{
+                paddingY: 4,
+                maxWidth: 550,
+                width: mobileView ? "100%" : largeView ? "35%" : "50%",
+            }}
         >
-            <Input
-                type="email"
-                name="email"
-                id="email"
-                label="Email"
-                register={{
-                    ...register("email", {
-                        required: {
-                            value: true,
-                            message: "Email is required!",
-                        },
-                        pattern: {
-                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                            message: "Invalid email address!",
-                        },
-                    }),
-                }}
-                onKeyUp={() => {
-                    trigger("email")
-                }}
-                error={errors.email}
-                autoFocus={true}
-            />
-            <Input
-                type="password"
-                name="password"
-                id="password"
-                label="Password"
-                register={{
-                    ...register("password", {
-                        required: {
-                            value: true,
-                            message: "Password is required!",
-                        },
-                        pattern: {
-                            value: /^(?=.*[\d])(?=.*[A-Z])(?=.*[a-z])(?=.*[!"#$%&\'()*+,-.\/:;<=>?@[\]^_`{|}~])[\w\d!"#$%&\'()*+,-.\/:;<=>?@[\]^_`{|}~]{8,}$/i,
-                            message:
-                                "Password must contain at least one letter, one number and one special character. No spaces.",
-                        },
-                        minLength: {
-                            value: 8,
-                            message: "Password must be at least 8 characters!",
-                        },
-                    }),
-                }}
-                onKeyUp={() => {
-                    trigger("password")
-                }}
-                error={errors.password}
-            />
-            <Input
-                type="password"
-                name="confirmPassword"
-                id="confirmPassword"
-                label="Confirm Password"
-                register={{
-                    ...register("confirmPassword", {
-                        required: {
-                            value: true,
-                            message: "You need to confirm the password!",
-                        },
-                        validate: (value) =>
-                            value === watch("password") ||
-                            "The password does not match",
-                    }),
-                }}
-                onKeyUp={() => {
-                    trigger("confirmPassword")
-                }}
-                error={errors.confirmPassword}
-            />
-            <Input
-                type="text"
-                name="username"
-                id="username"
-                label="Username"
-                register={{
-                    ...register("username", {
-                        required: {
-                            value: true,
-                            message: "Username is required!",
-                        },
-                        pattern: {
-                            value: /^[A-Za-z][A-Za-z0-9_]{4,14}$/i,
-                            message:
-                                "Username must start with a letter and only contain letter, number and underscore",
-                        },
-                        minLength: {
-                            value: 5,
-                            message: "Username must be at least 5 characters!",
-                        },
-                        maxLength: {
-                            value: 15,
-                            message: "Username must be at most 15 characters",
-                        },
-                    }),
-                }}
-                onKeyUp={() => {
-                    trigger("username")
-                }}
-                error={errors.username}
-            />
-            <Button
-                type="submit"
-                disabled={Object.keys(errors).length}
-                text="Register"
-                fullWidth={true}
-            />
-            {error.show && <AuthError code={error.code} />}
-            <p className="text-lg">
-                Already have an account?{" "}
-                <Link
-                    className="text-primary dark:text-primaryDark"
-                    to="/login"
+            <CardHeader title="Create Account" />
+            <CardContent>
+                <Box
+                    component="form"
+                    noValidate
+                    autoComplete="off"
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 2,
+                    }}
+                    onSubmit={handleSubmit(onSubmit)}
                 >
-                    <span className="inline-block hover:underline">Log In</span>
-                </Link>
-            </p>
-        </form>
+                    <Controller
+                        name="email"
+                        control={control}
+                        render={({ field }) => (
+                            <TextField
+                                {...field}
+                                variant="standard"
+                                required
+                                label="Email"
+                                error={!!errors.email}
+                                helperText={
+                                    errors.email ? errors?.email.message : ""
+                                }
+                            />
+                        )}
+                    ></Controller>
+                    <Controller
+                        name="password"
+                        control={control}
+                        render={({ field }) => (
+                            <TextField
+                                {...field}
+                                variant="standard"
+                                type="password"
+                                required
+                                label="Password"
+                                error={!!errors.password}
+                                helperText={
+                                    errors.password
+                                        ? errors?.password.message
+                                        : ""
+                                }
+                            />
+                        )}
+                    ></Controller>
+                    <Controller
+                        name="confirm"
+                        control={control}
+                        render={({ field }) => (
+                            <TextField
+                                {...field}
+                                variant="standard"
+                                type="password"
+                                required
+                                label="Confirm Password"
+                                error={!!errors.confirm}
+                                helperText={
+                                    errors.confirm
+                                        ? errors?.confirm.message
+                                        : ""
+                                }
+                            />
+                        )}
+                    ></Controller>
+                    <Controller
+                        name="username"
+                        control={control}
+                        render={({ field }) => (
+                            <TextField
+                                {...field}
+                                variant="standard"
+                                required
+                                label="Username"
+                                error={!!errors.username}
+                                helperText={
+                                    errors.username
+                                        ? errors?.username.message
+                                        : ""
+                                }
+                            />
+                        )}
+                    ></Controller>
+                    <Button
+                        variant="contained"
+                        type="submit"
+                        startIcon={<PersonAdd />}
+                        sx={{
+                            alignSelf: "center",
+                            width: "fit-content",
+                        }}
+                    >
+                        Register
+                    </Button>
+                    {fbError.show && (
+                        <Alert severity="error">
+                            {resolveFirebaseError(fbError.code)}
+                        </Alert>
+                    )}
+                </Box>
+            </CardContent>
+            <CardActions>
+                <Button
+                    fullWidth
+                    startIcon={<Login />}
+                    onClick={() => navigate("/login")}
+                >
+                    Already have an account?
+                </Button>
+            </CardActions>
+            {/* <Snackbar
+                open={success}
+                autoHideDuration={6000}
+                onClose={handleCloseAlert}
+            >
+                <Alert
+                    onClose={handleCloseAlert}
+                    severity="success"
+                    sx={{ width: "100%" }}
+                >
+                    Account has been created successfully.
+                </Alert>
+            </Snackbar> */}
+        </Card>
     )
 }
 

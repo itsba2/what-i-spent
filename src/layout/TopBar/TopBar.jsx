@@ -1,29 +1,35 @@
+import { AppBar, Container, Toolbar } from "@mui/material"
 import { Link } from "react-router-dom"
 
 import logo from "../../assets/what-i-spent.png"
 import BackButton from "./BackButton"
 import ToggleTheme from "./ToggleTheme"
 
-const TopBar = () => {
-    return (
-        <nav className="fixed flex w-full justify-between bg-surface p-2 dark:bg-surfaceDark">
-            <BackButton />
-            <Link
-                to="/"
-                className="flex gap-2"
+const TopBar = () => (
+    <AppBar position="sticky">
+        <Container maxWidth="lg">
+            <Toolbar
+                disableGutters
+                sx={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "space-between",
+                }}
             >
-                <img
-                    src={logo}
-                    className="h-10"
-                    alt="Logo"
-                />
-                <span className="hidden self-center whitespace-nowrap text-xl font-bold dark:text-onBackgroundDark sm:block">
-                    WHATiSPENT
-                </span>
-            </Link>
-            <ToggleTheme />
-        </nav>
-    )
-}
+                <BackButton />
+                <Link to="/">
+                    <img
+                        src={logo}
+                        alt="Logo"
+                        style={{
+                            height: 40,
+                        }}
+                    />
+                </Link>
+                <ToggleTheme />
+            </Toolbar>
+        </Container>
+    </AppBar>
+)
 
 export default TopBar

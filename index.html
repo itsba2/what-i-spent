@@ -11,7 +11,11 @@
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
-  <script src="./src/helpers/dark.js"></script>
+  <script>
+    if (!localStorage.getItem('color-mode')) {
+      localStorage.setItem('color-mode', 'light')
+    }
+  </script>
 </body>
 
 </html>

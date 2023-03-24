@@ -12,8 +12,8 @@ import { getDoc, doc, setDoc, serverTimestamp } from "firebase/firestore"
 import { AvatarGenerator } from "random-avatar-generator"
 
 // imports from files
-import { auth, db } from "../config/firebase"
-import FullPageSpinner from "../components/FullPageSpinner"
+import { auth, db } from "../firebase/config"
+// import FullPageSpinner from "../components/FullPageSpinner"
 
 const AuthContext = createContext()
 
@@ -26,21 +26,20 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true)
     const generator = new AvatarGenerator()
 
-    const createUser = (email, password, username) => {
-        createUserWithEmailAndPassword(auth, email, password).then(
-            (newUser) => {
-                setDoc(doc(db, "user", newUser.user.uid), {
-                    username,
-                    avatar:
-                        generator.generateRandomAvatar(newUser.user.uid) || "",
-                    isAdmin: false,
-                    disabled: false,
-                    createdAt: serverTimestamp(),
-                }).then((res) => {
-                    return newUser
-                })
-            }
+    const createUser = async (email, password, username) => {
+        const newUser = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
         )
+        await setDoc(doc(db, "user", newUser.user.uid), {
+            username,
+            avatar: generator.generateRandomAvatar(newUser.user.uid) || "",
+            isAdmin: false,
+            disabled: false,
+            createdAt: serverTimestamp(),
+        })
+        return newUser
     }
 
     const verifyAccount = () => {
@@ -51,9 +50,9 @@ export const AuthProvider = ({ children }) => {
         return sendPasswordResetEmail(auth, email)
     }
 
-    const logIn = (email, password) => {
+    const logIn = async (email, password) => {
         // TODO: login with username
-        return signInWithEmailAndPassword(auth, email, password)
+        return await signInWithEmailAndPassword(auth, email, password)
     }
 
     const logOut = () => {
@@ -91,7 +90,7 @@ export const AuthProvider = ({ children }) => {
         logOut,
     }
 
-    if (loading) return <FullPageSpinner />
+    // if (loading) return <FullPageSpinner />
 
     return (
         <AuthContext.Provider value={value}>

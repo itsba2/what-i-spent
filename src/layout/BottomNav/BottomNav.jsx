@@ -1,40 +1,39 @@
 import { Link, useLocation } from "react-router-dom"
-import { MdHome, MdMoney, MdQueryStats, MdAccountBox } from "react-icons/md"
-
-import { classNames } from "../../helpers/helpers"
+import { Paper, BottomNavigation, BottomNavigationAction } from "@mui/material"
+import { Home, Money, QueryStats, AccountBox } from "@mui/icons-material"
+import { useState } from "react"
 
 // navbar
 const navLinks = [
-    { title: "Home", route: "/", icon: <MdHome /> },
-    { title: "Expenses", route: "/expenses", icon: <MdMoney /> },
-    { title: "Stats", route: "/stats", icon: <MdQueryStats /> },
-    { title: "Account", route: "/account", icon: <MdAccountBox /> }
+    { label: "Home", route: "/", icon: <Home /> },
+    { label: "Expenses", route: "/expenses", icon: <Money /> },
+    { label: "Stats", route: "/stats", icon: <QueryStats /> },
+    { label: "Account", route: "/account", icon: <AccountBox /> },
 ]
 
 const BottomNav = () => {
-    const { pathname } = useLocation()
-
+    const location = useLocation()
     return (
-        <section id="bottomNav" className="block fixed w-full bottom-0 z-10 bg-surface dark:bg-surfaceDark shadow-inner">
-            <div className="grid grid-cols-4 py-2">
-                {navLinks.map((link, index) => (
-                    <Link
-                    key={`navlink${index}`}
-                        to={link.route ?? "#"}
-                        className={classNames(
-                            pathname === link.route &&
-                            "font-bold text-primary dark:text-primaryDark",
-                            " text-onSurface rounded sm:hover:bg-transparent hover:text-primary sm:p-0 dark:hover:text-primaryDark dark:text-onSurfaceDark sm:dark:hover:bg-transparent"
-                        )}
-                    >
-                        <div className="flex flex-col justify-center items-center">
-                            <span className="text-3xl">{link.icon}</span>
-                            <span className="text-base">{link.title}</span>
-                        </div>
-                    </Link>
+        <Paper
+            sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
+            elevation={3}
+        >
+            <BottomNavigation
+                showLabels
+                value={location.pathname}
+            >
+                {navLinks.map((navLink) => (
+                    <BottomNavigationAction
+                        key={navLink.label}
+                        LinkComponent={Link}
+                        to={navLink.route}
+                        value={navLink.route}
+                        label={navLink.label}
+                        icon={navLink.icon}
+                    />
                 ))}
-            </div>
-        </section>
+            </BottomNavigation>
+        </Paper>
     )
 }
 

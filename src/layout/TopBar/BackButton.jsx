@@ -2,6 +2,9 @@ import { MdArrowBack } from "react-icons/md"
 import { useNavigate, useLocation } from "react-router-dom"
 import { classNames } from "../../helpers/helpers"
 
+import { IconButton } from "@mui/material"
+import { ArrowBackIosNew } from "@mui/icons-material"
+
 const BackButton = () => {
     const navigate = useNavigate()
     const location = useLocation()
@@ -15,17 +18,15 @@ const BackButton = () => {
         navigate(backPath)
     }
     return (
-        <button
+        <IconButton
+            color="inherit"
             onClick={goBack}
-            className={classNames(
-                location.pathname === "/" && "invisible",
-                "cursor-pointer rounded-full p-2 text-2xl hover:bg-surfaceVar dark:hover:bg-surfaceVarDark"
-            )}
+            sx={{
+                visibility: location.pathname === "/" ? "hidden" : "visible",
+            }}
         >
-            <span className="text-onSurface">
-                <MdArrowBack />
-            </span>
-        </button>
+            <ArrowBackIosNew />
+        </IconButton>
     )
 }
 

@@ -5,30 +5,34 @@ export const classNames = (...classes) => {
 export const resolveFirebaseError = (code) => {
     const errors = [
         {
-            code: "email-already-exists",
+            code: "auth/email-already-exists",
             msg: "Email already exists!",
         },
         {
-            code: "user-not-found",
+            code: "auth/email-already-in-use",
+            msg: "Email already in use!",
+        },
+        {
+            code: "auth/user-not-found",
             msg: "Invalid username/password!",
         },
         {
-            code: "wrong-password",
+            code: "auth/wrong-password",
             msg: "Invalid username/password!",
         },
         {
-            code: "internal-error",
+            code: "auth/internal-error",
             msg: "The Authentication server encountered an unexpected error while trying to process the request!",
         },
         {
-            code: "missing-email",
+            code: "auth/missing-email",
             msg: "This email address is not registered!",
         },
         {
-            code: "invalid-email",
+            code: "auth/invalid-email",
             msg: "Invalid email address!",
         },
     ]
-    const error = errors.find((err) => `auth/${err.code}` === code) || {}
+    const error = errors.find((err) => err.code === code) || {}
     return error.msg ?? "Unkown error."
 }
