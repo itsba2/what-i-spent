@@ -110,7 +110,7 @@ const Register = () => {
         <Card
             elevation={1}
             sx={{
-                paddingY: 4,
+                mt: 4,
                 maxWidth: 550,
                 width: mobileView ? "100%" : largeView ? "35%" : "50%",
             }}
@@ -227,19 +227,6 @@ const Register = () => {
                     Already have an account?
                 </Button>
             </CardActions>
-            {/* <Snackbar
-                open={success}
-                autoHideDuration={6000}
-                onClose={handleCloseAlert}
-            >
-                <Alert
-                    onClose={handleCloseAlert}
-                    severity="success"
-                    sx={{ width: "100%" }}
-                >
-                    Account has been created successfully.
-                </Alert>
-            </Snackbar> */}
         </Card>
     )
 }

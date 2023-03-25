@@ -6,21 +6,23 @@ import {
     TextField,
     Button,
     useMediaQuery,
-    Alert,
     Card,
     CardHeader,
     CardContent,
     CardActions,
     ButtonGroup,
-    Snackbar,
-    Slide,
+    useTheme,
 } from "@mui/material"
-import { Login, LockReset, PersonAdd } from "@mui/icons-material"
-import { useTheme } from "@mui/material/styles"
+import {
+    Login as LoginIcon,
+    LockReset as ResetIcon,
+    PersonAdd as RegisterIcon,
+} from "@mui/icons-material"
 import { useEffect, useState } from "react"
 import { resolveFirebaseError } from "../helpers/helpers"
 import { useAuth } from "../auth/AuthProvider"
 import { useNavigate } from "react-router-dom"
+import Feedback from "../components/Feedback"
 
 const defaultValues = {
     email: "",
@@ -29,7 +31,7 @@ const defaultValues = {
     username: "",
 }
 
-const initialFbError = { code: "", show: false }
+const initialFeedback = { type: "", show: false, msg: "" }
 
 const LogIn = () => {
     const { logIn, currentUser } = useAuth()
@@ -39,7 +41,7 @@ const LogIn = () => {
         if (currentUser) navigate("/", { replace: true })
     }, [currentUser])
 
-    const [fbError, setFbError] = useState(initialFbError)
+    const [feedback, setFeedback] = useState(initialFeedback)
 
     const theme = useTheme()
     const mobileView = useMediaQuery(theme.breakpoints.down("sm"))
@@ -60,24 +62,23 @@ const LogIn = () => {
         defaultValues,
     })
     const onSubmit = async (data) => {
-        setFbError(initialFbError)
+        setFeedback(initialFeedback)
         try {
             await logIn(data.email, data.password, data.username)
         } catch (error) {
-            setFbError({ code: error.code, show: true })
+            setFeedback({
+                type: "error",
+                show: true,
+                msg: resolveFirebaseError(error.code),
+            })
         }
-    }
-
-    const handleCloseAlert = (event, reason) => {
-        if (reason === "clickaway") return
-        setFbError((prev) => ({ ...prev, show: false }))
     }
 
     return (
         <Card
             elevation={1}
             sx={{
-                paddingY: 4,
+                mt: 4,
                 maxWidth: 550,
                 width: mobileView ? "100%" : largeView ? "35%" : "50%",
             }}
@@ -89,10 +90,8 @@ const LogIn = () => {
                     noValidate
                     autoComplete="off"
                     sx={{
-                        paddingY: 4,
                         display: "flex",
                         flexDirection: "column",
-
                         gap: 2,
                     }}
                     onSubmit={handleSubmit(onSubmit)}
@@ -135,7 +134,7 @@ const LogIn = () => {
 
                     <Button
                         variant="contained"
-                        startIcon={<Login />}
+                        startIcon={<LoginIcon />}
                         type="submit"
                         sx={{
                             alignSelf: "center",
@@ -152,40 +151,23 @@ const LogIn = () => {
                     variant="text"
                 >
                     <Button
-                        startIcon={<LockReset />}
+                        startIcon={<ResetIcon />}
                         href="/reset-password"
-                        // onClick={() => navigate("/reset-password")}
                     >
                         Reset Password
                     </Button>
                     <Button
-                        startIcon={<PersonAdd />}
+                        startIcon={<RegisterIcon />}
                         href="/register"
-                        // onClick={() => navigate("/register")}
                     >
                         Create Account
                     </Button>
                 </ButtonGroup>
             </CardActions>
-            <Snackbar
-                TransitionComponent={(props) => (
-                    <Slide
-                        {...props}
-                        direction="right"
-                    />
-                )}
-                open={fbError.show}
-                autoHideDuration={4000}
-                onClose={handleCloseAlert}
-            >
-                <Alert
-                    severity="error"
-                    onClose={handleCloseAlert}
-                    sx={{ width: "100%" }}
-                >
-                    {resolveFirebaseError(fbError.code)}
-                </Alert>
-            </Snackbar>
+            <Feedback
+                feedback={feedback}
+                setFeedback={setFeedback}
+            />
         </Card>
     )
 }

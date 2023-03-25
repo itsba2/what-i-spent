@@ -1,4 +1,4 @@
-import { AppBar, Container, Toolbar } from "@mui/material"
+import { AppBar, Container, Box, Toolbar, Typography } from "@mui/material"
 import { Link } from "react-router-dom"
 
 import logo from "../../assets/what-i-spent.png"
@@ -17,15 +17,26 @@ const TopBar = () => (
                 }}
             >
                 <BackButton />
-                <Link to="/">
-                    <img
-                        src={logo}
-                        alt="Logo"
-                        style={{
-                            height: 40,
-                        }}
-                    />
-                </Link>
+                <Box
+                    display="inline-flex"
+                    alignItems="center"
+                >
+                    <Link to="/">
+                        <img
+                            src={logo}
+                            alt="Logo"
+                            style={{
+                                height: 40,
+                            }}
+                        />
+                    </Link>
+                    <Typography
+                        variant="body1"
+                        sx={{ letterSpacing: "0.2rem", ml: 1 }}
+                    >
+                        WHATiSPENT
+                    </Typography>
+                </Box>
                 <ToggleTheme />
             </Toolbar>
         </Container>

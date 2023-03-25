@@ -12,13 +12,14 @@ import { ColorModeProvider } from "./styles/ColorModeProvider"
 
 // page imports
 import App from "./App"
+import AppError from "./layout/AppError"
 import Home from "./pages/Home"
 import LogIn from "./pages/LogIn"
 import Register from "./pages/Register"
 import Expenses from "./pages/Expenses"
 import Stats from "./pages/Stats"
 import Account from "./pages/Account"
-// import ResetPassword from "./pages/ResetPassword"
+import ResetPassword from "./pages/ResetPassword"
 // import AddExpense from "./pages/AddExpense"
 
 // router object
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
     {
         path: "",
         element: <App />,
+        errorElement: <AppError/>,
         children: [
             {
                 path: "/",
@@ -39,10 +41,10 @@ const router = createBrowserRouter([
                 path: "/login",
                 element: <LogIn />,
             },
-            // {
-            //     path: "/reset-password",
-            //     element: <ResetPassword />,
-            // },
+            {
+                path: "/reset-password",
+                element: <ResetPassword />,
+            },
             {
                 path: "/expenses",
                 element: (
