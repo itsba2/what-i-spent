@@ -14,7 +14,7 @@ import { useAuth } from "../auth/AuthProvider"
 import { resolveFirebaseError } from "../helpers/helpers"
 import Feedback from "../components/Feedback"
 
-const initialFeedback = { type: "", show: false, msg: "" }
+const initialFeedback = { type: "error", show: false, msg: "" }
 
 const Account = () => {
     const { currentUser, logOut, verifyAccount } = useAuth()

@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }) => {
             avatar: generator.generateRandomAvatar(newUser.user.uid) || "",
             isAdmin: false,
             disabled: false,
+            currencyPref: "EUR",
             createdAt: serverTimestamp(),
         })
         return newUser

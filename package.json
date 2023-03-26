@@ -14,8 +14,10 @@
         "@hookform/resolvers": "^3.0.0",
         "@mui/icons-material": "^5.11.11",
         "@mui/material": "^5.11.14",
+        "@mui/x-date-pickers": "^6.0.3",
         "@reduxjs/toolkit": "^1.9.3",
         "axios": "^1.3.4",
+        "dayjs": "^1.11.7",
         "firebase": "^9.17.1",
         "prop-types": "^15.8.1",
         "random-avatar-generator": "^2.0.0",
@@ -23,6 +25,7 @@
         "react-dom": "^18.2.0",
         "react-hook-form": "^7.43.5",
         "react-icons": "^4.7.1",
+        "react-number-format": "^5.1.4",
         "react-redux": "^8.0.5",
         "react-router-dom": "^6.8.1",
         "zod": "^3.21.4"

@@ -6,20 +6,25 @@ import {
     TextField,
     Button,
     useMediaQuery,
-    Alert,
     Card,
     CardHeader,
     CardContent,
     CardActions,
-    ButtonGroup,
-    Snackbar,
+    InputAdornment,
+    IconButton,
 } from "@mui/material"
-import { PersonAdd, Login } from "@mui/icons-material"
+import {
+    PersonAdd as RegisterIcon,
+    Login as LoginIcon,
+    Visibility as ShowIcon,
+    VisibilityOff as HideIcon,
+} from "@mui/icons-material"
 import { useTheme } from "@mui/material/styles"
 import { useEffect, useState } from "react"
 import { resolveFirebaseError } from "../helpers/helpers"
 import { useAuth } from "../auth/AuthProvider"
 import { useNavigate } from "react-router-dom"
+import Feedback from "../components/Feedback"
 
 const defaultValues = {
     email: "",
@@ -28,7 +33,7 @@ const defaultValues = {
     username: "",
 }
 
-const initialFbError = { code: "", show: false }
+const initialFeedback = { type: "error", show: false, msg: "" }
 
 const Register = () => {
     const { createUser, currentUser } = useAuth()
@@ -38,8 +43,10 @@ const Register = () => {
         if (currentUser) navigate("/", { replace: true })
     }, [currentUser])
 
-    const [fbError, setFbError] = useState(initialFbError)
-    // const [success, setSuccess] = useState(false)
+    const [feedback, setFeedback] = useState(initialFeedback)
+    const [showPassword, toggleShowPassword] = useState(false)
+
+    const handleShowPassword = () => toggleShowPassword((prev) => !prev)
 
     const theme = useTheme()
     const mobileView = useMediaQuery(theme.breakpoints.down("sm"))
@@ -90,144 +97,179 @@ const Register = () => {
     })
 
     const onSubmit = async (data) => {
-        // console.log(data)
-        setFbError(initialFbError)
+        setFeedback(initialFeedback)
         try {
             await createUser(data.email, data.password, data.username)
-            // setSuccess(true)
         } catch (error) {
-            console.log(error.code)
-            setFbError({ code: error.code, show: true })
+            setFeedback({
+                type: "error",
+                show: true,
+                msg: resolveFirebaseError(error.code),
+            })
         }
     }
 
-    // const handleCloseAlert = (event, reason) => {
-    //     if (reason === "clickaway") return
-    //     setSuccess(false)
-    // }
-
     return (
-        <Card
-            elevation={1}
-            sx={{
-                mt: 4,
-                maxWidth: 550,
-                width: mobileView ? "100%" : largeView ? "35%" : "50%",
-            }}
-        >
-            <CardHeader title="Create Account" />
-            <CardContent>
-                <Box
-                    component="form"
-                    noValidate
-                    autoComplete="off"
-                    sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 2,
-                    }}
-                    onSubmit={handleSubmit(onSubmit)}
-                >
-                    <Controller
-                        name="email"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                variant="standard"
-                                required
-                                label="Email"
-                                error={!!errors.email}
-                                helperText={
-                                    errors.email ? errors?.email.message : ""
-                                }
-                            />
-                        )}
-                    ></Controller>
-                    <Controller
-                        name="password"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                variant="standard"
-                                type="password"
-                                required
-                                label="Password"
-                                error={!!errors.password}
-                                helperText={
-                                    errors.password
-                                        ? errors?.password.message
-                                        : ""
-                                }
-                            />
-                        )}
-                    ></Controller>
-                    <Controller
-                        name="confirm"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                variant="standard"
-                                type="password"
-                                required
-                                label="Confirm Password"
-                                error={!!errors.confirm}
-                                helperText={
-                                    errors.confirm
-                                        ? errors?.confirm.message
-                                        : ""
-                                }
-                            />
-                        )}
-                    ></Controller>
-                    <Controller
-                        name="username"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                variant="standard"
-                                required
-                                label="Username"
-                                error={!!errors.username}
-                                helperText={
-                                    errors.username
-                                        ? errors?.username.message
-                                        : ""
-                                }
-                            />
-                        )}
-                    ></Controller>
-                    <Button
-                        variant="contained"
-                        type="submit"
-                        startIcon={<PersonAdd />}
+        <>
+            <Card
+                elevation={1}
+                sx={{
+                    mt: 4,
+                    maxWidth: 550,
+                    width: mobileView ? "100%" : largeView ? "35%" : "50%",
+                }}
+            >
+                <CardHeader title="Create Account" />
+                <CardContent>
+                    <Box
+                        component="form"
+                        noValidate
+                        autoComplete="off"
                         sx={{
-                            alignSelf: "center",
-                            width: "fit-content",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2,
                         }}
+                        onSubmit={handleSubmit(onSubmit)}
                     >
-                        Register
+                        <Controller
+                            name="email"
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    variant="standard"
+                                    required
+                                    label="Email"
+                                    error={!!errors.email}
+                                    helperText={
+                                        errors.email
+                                            ? errors?.email.message
+                                            : ""
+                                    }
+                                />
+                            )}
+                        ></Controller>
+                        <Controller
+                            name="password"
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    variant="standard"
+                                    type={showPassword ? "text" : "password"}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    onClick={handleShowPassword}
+                                                    onMouseDown={(event) =>
+                                                        event.preventDefault()
+                                                    }
+                                                >
+                                                    {showPassword ? (
+                                                        <HideIcon />
+                                                    ) : (
+                                                        <ShowIcon />
+                                                    )}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                    required
+                                    label="Password"
+                                    error={!!errors.password}
+                                    helperText={
+                                        errors.password
+                                            ? errors?.password.message
+                                            : ""
+                                    }
+                                />
+                            )}
+                        ></Controller>
+                        <Controller
+                            name="confirm"
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    variant="standard"
+                                    type={showPassword ? "text" : "password"}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    onClick={handleShowPassword}
+                                                    onMouseDown={(event) =>
+                                                        event.preventDefault()
+                                                    }
+                                                >
+                                                    {showPassword ? (
+                                                        <HideIcon />
+                                                    ) : (
+                                                        <ShowIcon />
+                                                    )}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                    required
+                                    label="Confirm Password"
+                                    error={!!errors.confirm}
+                                    helperText={
+                                        errors.confirm
+                                            ? errors?.confirm.message
+                                            : ""
+                                    }
+                                />
+                            )}
+                        ></Controller>
+                        <Controller
+                            name="username"
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    variant="standard"
+                                    required
+                                    label="Username"
+                                    error={!!errors.username}
+                                    helperText={
+                                        errors.username
+                                            ? errors?.username.message
+                                            : ""
+                                    }
+                                />
+                            )}
+                        ></Controller>
+                        <Button
+                            variant="contained"
+                            type="submit"
+                            startIcon={<RegisterIcon />}
+                            sx={{
+                                alignSelf: "center",
+                                width: "fit-content",
+                            }}
+                        >
+                            Register
+                        </Button>
+                    </Box>
+                </CardContent>
+                <CardActions>
+                    <Button
+                        fullWidth
+                        startIcon={<LoginIcon />}
+                        onClick={() => navigate("/login")}
+                    >
+                        Already have an account?
                     </Button>
-                    {fbError.show && (
-                        <Alert severity="error">
-                            {resolveFirebaseError(fbError.code)}
-                        </Alert>
-                    )}
-                </Box>
-            </CardContent>
-            <CardActions>
-                <Button
-                    fullWidth
-                    startIcon={<Login />}
-                    onClick={() => navigate("/login")}
-                >
-                    Already have an account?
-                </Button>
-            </CardActions>
-        </Card>
+                </CardActions>
+            </Card>
+            <Feedback
+                feedback={feedback}
+                setFeedback={setFeedback}
+            />
+        </>
     )
 }
 

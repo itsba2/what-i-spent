@@ -6,7 +6,7 @@ const Expenses = () => {
     return (
         <div>
             Expenses
-            <Link to="/add-expense">
+            <Link to="/expenses/add">
                 <Fab
                     color="secondary"
                     sx={{ position: "fixed", bottom: 70, right: 10 }}

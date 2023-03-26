@@ -12,11 +12,15 @@ import {
     CardActions,
     ButtonGroup,
     useTheme,
+    IconButton,
+    InputAdornment,
 } from "@mui/material"
 import {
     Login as LoginIcon,
     LockReset as ResetIcon,
     PersonAdd as RegisterIcon,
+    Visibility as ShowIcon,
+    VisibilityOff as HideIcon,
 } from "@mui/icons-material"
 import { useEffect, useState } from "react"
 import { resolveFirebaseError } from "../helpers/helpers"
@@ -31,7 +35,7 @@ const defaultValues = {
     username: "",
 }
 
-const initialFeedback = { type: "", show: false, msg: "" }
+const initialFeedback = { type: "error", show: false, msg: "" }
 
 const LogIn = () => {
     const { logIn, currentUser } = useAuth()
@@ -42,6 +46,9 @@ const LogIn = () => {
     }, [currentUser])
 
     const [feedback, setFeedback] = useState(initialFeedback)
+    const [showPassword, toggleShowPassword] = useState(false)
+
+    const handleShowPassword = () => toggleShowPassword((prev) => !prev)
 
     const theme = useTheme()
     const mobileView = useMediaQuery(theme.breakpoints.down("sm"))
@@ -75,100 +82,122 @@ const LogIn = () => {
     }
 
     return (
-        <Card
-            elevation={1}
-            sx={{
-                mt: 4,
-                maxWidth: 550,
-                width: mobileView ? "100%" : largeView ? "35%" : "50%",
-            }}
-        >
-            <CardHeader title="Log In" />
-            <CardContent>
-                <Box
-                    component="form"
-                    noValidate
-                    autoComplete="off"
-                    sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 2,
-                    }}
-                    onSubmit={handleSubmit(onSubmit)}
-                >
-                    <Controller
-                        name="email"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                variant="standard"
-                                required
-                                label="Email"
-                                error={!!errors.email}
-                                helperText={
-                                    errors.email ? errors?.email.message : ""
-                                }
-                            />
-                        )}
-                    ></Controller>
-                    <Controller
-                        name="password"
-                        control={control}
-                        render={({ field }) => (
-                            <TextField
-                                {...field}
-                                variant="standard"
-                                type="password"
-                                required
-                                label="Password"
-                                error={!!errors.password}
-                                helperText={
-                                    errors.password
-                                        ? errors?.password.message
-                                        : ""
-                                }
-                            />
-                        )}
-                    ></Controller>
-
-                    <Button
-                        variant="contained"
-                        startIcon={<LoginIcon />}
-                        type="submit"
+        <>
+            <Card
+                elevation={1}
+                sx={{
+                    mt: 4,
+                    maxWidth: 550,
+                    width: mobileView ? "100%" : largeView ? "35%" : "50%",
+                }}
+            >
+                <CardHeader title="Log In" />
+                <CardContent>
+                    <Box
+                        component="form"
+                        noValidate
+                        autoComplete="off"
                         sx={{
-                            alignSelf: "center",
-                            width: "fit-content",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2,
                         }}
+                        onSubmit={handleSubmit(onSubmit)}
                     >
-                        Log In
-                    </Button>
-                </Box>
-            </CardContent>
-            <CardActions>
-                <ButtonGroup
-                    fullWidth
-                    variant="text"
-                >
-                    <Button
-                        startIcon={<ResetIcon />}
-                        href="/reset-password"
+                        <Controller
+                            name="email"
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    variant="standard"
+                                    required
+                                    label="Email"
+                                    error={!!errors.email}
+                                    helperText={
+                                        errors.email
+                                            ? errors?.email.message
+                                            : ""
+                                    }
+                                />
+                            )}
+                        ></Controller>
+                        <Controller
+                            name="password"
+                            control={control}
+                            render={({ field }) => (
+                                <TextField
+                                    {...field}
+                                    variant="standard"
+                                    type={showPassword ? "text" : "password"}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    onClick={handleShowPassword}
+                                                    onMouseDown={(event) =>
+                                                        event.preventDefault()
+                                                    }
+                                                >
+                                                    {showPassword ? (
+                                                        <HideIcon />
+                                                    ) : (
+                                                        <ShowIcon />
+                                                    )}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                    required
+                                    label="Password"
+                                    error={!!errors.password}
+                                    helperText={
+                                        errors.password
+                                            ? errors?.password.message
+                                            : ""
+                                    }
+                                />
+                            )}
+                        ></Controller>
+
+                        <Button
+                            variant="contained"
+                            startIcon={<LoginIcon />}
+                            type="submit"
+                            sx={{
+                                alignSelf: "center",
+                                width: "fit-content",
+                            }}
+                        >
+                            Log In
+                        </Button>
+                    </Box>
+                </CardContent>
+                <CardActions>
+                    <ButtonGroup
+                        fullWidth
+                        variant="text"
                     >
-                        Reset Password
-                    </Button>
-                    <Button
-                        startIcon={<RegisterIcon />}
-                        href="/register"
-                    >
-                        Create Account
-                    </Button>
-                </ButtonGroup>
-            </CardActions>
+                        <Button
+                            startIcon={<ResetIcon />}
+                            href="/reset-password"
+                        >
+                            Reset Password
+                        </Button>
+                        <Button
+                            startIcon={<RegisterIcon />}
+                            href="/register"
+                        >
+                            Create Account
+                        </Button>
+                    </ButtonGroup>
+                </CardActions>
+            </Card>
             <Feedback
                 feedback={feedback}
                 setFeedback={setFeedback}
             />
-        </Card>
+        </>
     )
 }
 

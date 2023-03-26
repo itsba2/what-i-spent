@@ -3,6 +3,8 @@ import React from "react"
 import ReactDOM from "react-dom/client"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { Provider as StoreProvider } from "react-redux"
+import { LocalizationProvider } from "@mui/x-date-pickers"
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 
 // imports from files
 import { store } from "./app/store"
@@ -20,14 +22,14 @@ import Expenses from "./pages/Expenses"
 import Stats from "./pages/Stats"
 import Account from "./pages/Account"
 import ResetPassword from "./pages/ResetPassword"
-// import AddExpense from "./pages/AddExpense"
+import AddExpense from "./pages/AddExpense"
 
 // router object
 const router = createBrowserRouter([
     {
         path: "",
         element: <App />,
-        errorElement: <AppError/>,
+        errorElement: <AppError />,
         children: [
             {
                 path: "/",
@@ -53,14 +55,14 @@ const router = createBrowserRouter([
                     </AuthRequired>
                 ),
             },
-            // {
-            //     path: "/add-expense",
-            //     element: (
-            //         <AuthRequired>
-            //             <AddExpense />
-            //         </AuthRequired>
-            //     ),
-            // },
+            {
+                path: "/expenses/add",
+                element: (
+                    <AuthRequired>
+                        <AddExpense />
+                    </AuthRequired>
+                ),
+            },
             {
                 path: "/stats",
                 element: (
@@ -86,7 +88,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <StoreProvider store={store}>
             <AuthProvider>
                 <ColorModeProvider>
-                    <RouterProvider router={router} />
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <RouterProvider router={router} />
+                    </LocalizationProvider>
                 </ColorModeProvider>
             </AuthProvider>
         </StoreProvider>
