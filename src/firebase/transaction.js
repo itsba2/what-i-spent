@@ -4,12 +4,35 @@ import {
     arrayUnion,
     collection,
     doc,
+    documentId,
+    getDoc,
+    getDocs,
+    query,
     updateDoc,
+    where,
 } from "firebase/firestore"
 import { db } from "./config"
 
-export const getTransactions = (id) => {
-    // TODO: get user's all expenses
+export const fetchExpenses = async (userId) => {
+    try {
+        let user
+        const userSnap = await getDoc(doc(db, "user", userId))
+        if (!userSnap.exists()) {
+            return { msg: "No user record has been found."}
+        }
+        user = userSnap.data()
+        const expenseQuery = query(
+            collection(db, "expense"),
+            where(documentId(), "in", user.expenses)
+        )
+        const userExpensesSnap = await getDocs(expenseQuery)
+        return userExpensesSnap.docs.map((doc) => ({
+            ...doc.data(),
+            date: doc.data().date.seconds,
+        }))
+    } catch (error) {
+        return error
+    }
 }
 
 export const addTransaction = async (
