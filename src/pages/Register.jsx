@@ -138,7 +138,7 @@ const Register = () => {
                             render={({ field }) => (
                                 <TextField
                                     {...field}
-                                    variant="standard"
+                                    variant="outlined"
                                     required
                                     label="Email"
                                     error={!!errors.email}
@@ -156,7 +156,7 @@ const Register = () => {
                             render={({ field }) => (
                                 <TextField
                                     {...field}
-                                    variant="standard"
+                                    variant="outlined"
                                     type={showPassword ? "text" : "password"}
                                     InputProps={{
                                         endAdornment: (
@@ -193,7 +193,7 @@ const Register = () => {
                             render={({ field }) => (
                                 <TextField
                                     {...field}
-                                    variant="standard"
+                                    variant="outlined"
                                     type={showPassword ? "text" : "password"}
                                     InputProps={{
                                         endAdornment: (
@@ -230,7 +230,7 @@ const Register = () => {
                             render={({ field }) => (
                                 <TextField
                                     {...field}
-                                    variant="standard"
+                                    variant="outlined"
                                     required
                                     label="Username"
                                     error={!!errors.username}

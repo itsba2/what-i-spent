@@ -1,23 +1,21 @@
-import { useState } from "react"
-import {
-    Avatar,
-    Typography,
-    Button,
-    Box,
-    Snackbar,
-    Slide,
-    Alert,
-} from "@mui/material"
+import { useEffect, useState } from "react"
+import { Typography, Button, Box } from "@mui/material"
 
 import Modal from "../components/Modal"
 import { useAuth } from "../auth/AuthProvider"
 import { resolveFirebaseError } from "../helpers/helpers"
 import Feedback from "../components/Feedback"
+import { useNavigate } from "react-router-dom"
 
 const initialFeedback = { type: "error", show: false, msg: "" }
 
 const Account = () => {
     const { currentUser, logOut, verifyAccount } = useAuth()
+    const navigate = useNavigate()
+    useEffect(() => {
+        !currentUser && navigate("/login")
+    }, [])
+
     const [showLogoutModal, toggleLogoutModal] = useState(false)
     const [feedback, setFeedback] = useState(initialFeedback)
 
@@ -39,18 +37,10 @@ const Account = () => {
     }
 
     return (
-        <Box>
+        <>
             {currentUser && (
                 <Box>
                     <Typography variant="h3">{currentUser.username}</Typography>
-                    <Avatar
-                        src={currentUser.avatar}
-                        alt={currentUser.username}
-                        sx={{
-                            width: 128,
-                            height: 128,
-                        }}
-                    />
                     <Button
                         variant="contained"
                         onClick={() => toggleLogoutModal(true)}
@@ -69,21 +59,22 @@ const Account = () => {
                             onYes={() => logOut()}
                         />
                     )}
+                    {!currentUser.emailVerified && (
+                        <Button
+                            variant="contained"
+                            onClick={handleVerifyAccount}
+                        >
+                            Verify Email
+                        </Button>
+                    )}
                 </Box>
             )}
-            {!currentUser.emailVerified && (
-                <Button
-                    variant="contained"
-                    onClick={handleVerifyAccount}
-                >
-                    Verify Email
-                </Button>
-            )}
+
             <Feedback
                 feedback={feedback}
                 setFeedback={setFeedback}
             />
-        </Box>
+        </>
     )
 }
 

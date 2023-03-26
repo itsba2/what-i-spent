@@ -9,7 +9,6 @@ import {
     signOut,
 } from "firebase/auth"
 import { getDoc, doc, setDoc, serverTimestamp } from "firebase/firestore"
-import { AvatarGenerator } from "random-avatar-generator"
 
 // imports from files
 import { auth, db } from "../firebase/config"
@@ -24,7 +23,6 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState()
     const [loading, setLoading] = useState(true)
-    const generator = new AvatarGenerator()
 
     const createUser = async (email, password, username) => {
         const newUser = await createUserWithEmailAndPassword(
@@ -34,7 +32,6 @@ export const AuthProvider = ({ children }) => {
         )
         await setDoc(doc(db, "user", newUser.user.uid), {
             username,
-            avatar: generator.generateRandomAvatar(newUser.user.uid) || "",
             isAdmin: false,
             disabled: false,
             currencyPref: "EUR",

@@ -110,7 +110,7 @@ const LogIn = () => {
                             render={({ field }) => (
                                 <TextField
                                     {...field}
-                                    variant="standard"
+                                    variant="outlined"
                                     required
                                     label="Email"
                                     error={!!errors.email}
@@ -128,7 +128,7 @@ const LogIn = () => {
                             render={({ field }) => (
                                 <TextField
                                     {...field}
-                                    variant="standard"
+                                    variant="outlined"
                                     type={showPassword ? "text" : "password"}
                                     InputProps={{
                                         endAdornment: (

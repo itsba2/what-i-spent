@@ -104,7 +104,7 @@ const ResetPassword = () => {
                             render={({ field }) => (
                                 <TextField
                                     {...field}
-                                    variant="standard"
+                                    variant="outlined"
                                     required
                                     label="Email"
                                     error={!!errors.email}

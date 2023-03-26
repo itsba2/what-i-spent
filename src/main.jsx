@@ -18,11 +18,11 @@ import AppError from "./layout/AppError"
 import Home from "./pages/Home"
 import LogIn from "./pages/LogIn"
 import Register from "./pages/Register"
-import Expenses from "./pages/Expenses"
+import Transactions from "./pages/Transactions"
 import Stats from "./pages/Stats"
 import Account from "./pages/Account"
 import ResetPassword from "./pages/ResetPassword"
-import AddExpense from "./pages/AddExpense"
+import AddExpense from "./pages/AddTransaction"
 
 // router object
 const router = createBrowserRouter([
@@ -48,37 +48,53 @@ const router = createBrowserRouter([
                 element: <ResetPassword />,
             },
             {
-                path: "/expenses",
-                element: (
-                    <AuthRequired>
-                        <Expenses />
-                    </AuthRequired>
-                ),
+                path: "/transactions",
+                element: <Transactions />,
             },
             {
-                path: "/expenses/add",
-                element: (
-                    <AuthRequired>
-                        <AddExpense />
-                    </AuthRequired>
-                ),
+                path: "/transactions/add",
+                element: <AddExpense />,
             },
             {
                 path: "/stats",
-                element: (
-                    <AuthRequired>
-                        <Stats />
-                    </AuthRequired>
-                ),
+                element: <Stats />,
             },
             {
                 path: "/account",
-                element: (
-                    <AuthRequired>
-                        <Account />
-                    </AuthRequired>
-                ),
+                element: <Account />,
             },
+            // {
+            //     path: "/expenses",
+            //     element: (
+            //         <AuthRequired>
+            //             <Expenses />
+            //         </AuthRequired>
+            //     ),
+            // },
+            // {
+            //     path: "/expenses/add",
+            //     element: (
+            //         <AuthRequired>
+            //             <AddExpense />
+            //         </AuthRequired>
+            //     ),
+            // },
+            // {
+            //     path: "/stats",
+            //     element: (
+            //         <AuthRequired>
+            //             <Stats />
+            //         </AuthRequired>
+            //     ),
+            // },
+            // {
+            //     path: "/account",
+            //     element: (
+            //         <AuthRequired>
+            //             <Account />
+            //         </AuthRequired>
+            //     ),
+            // },
         ],
     },
 ])

@@ -2,11 +2,11 @@ import { Fab } from "@mui/material"
 import { Add } from "@mui/icons-material"
 import { Link } from "react-router-dom"
 
-const Expenses = () => {
+const Transactions = () => {
     return (
         <div>
-            Expenses
-            <Link to="/expenses/add">
+            Transactions
+            <Link to="/transactions/add">
                 <Fab
                     color="secondary"
                     sx={{ position: "fixed", bottom: 70, right: 10 }}
@@ -18,4 +18,4 @@ const Expenses = () => {
     )
 }
 
-export default Expenses
+export default Transactions

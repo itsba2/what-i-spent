@@ -16,10 +16,12 @@ import {
     MenuItem,
     FormHelperText,
     CardActions,
-    ButtonGroup,
+    RadioGroup,
+    Radio,
+    FormControlLabel,
 } from "@mui/material"
 import { Add as AddIcon, Close as CancelIcon } from "@mui/icons-material"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { resolveFirebaseError } from "../helpers/helpers"
 import categories from "../helpers/categories"
 import { useAuth } from "../auth/AuthProvider"
@@ -32,17 +34,18 @@ import { DatePicker } from "@mui/x-date-pickers"
 import dayjs, { isDayjs } from "dayjs"
 import AmountFormat from "../components/AmountFormat"
 import currencies from "../helpers/currency.json"
-import { addExpense } from "../firebase/expense"
+import { addTransaction } from "../firebase/transaction"
 
 const initialFeedback = { type: "error", show: false, msg: "" }
 
-const AddExpense = () => {
+const AddTransaction = () => {
     const { currentUser } = useAuth()
     const navigate = useNavigate()
     const [feedback, setFeedback] = useState(initialFeedback)
     const [selectedCurrency, setSelectedCurrency] = useState(
         currentUser.currencyPref
     )
+    const [transactionType, setTransactionType] = useState("expense")
 
     const theme = useTheme()
     const mobileView = useMediaQuery(theme.breakpoints.down("sm"))
@@ -50,7 +53,8 @@ const AddExpense = () => {
 
     const formSchema = zod
         .object({
-            category: zod.string().min(1, "Cateogry is required"),
+            type: zod.enum(["expense", "earning"]),
+            category: zod.string().min(1, "Category is required"),
             title: zod
                 .string()
                 .min(1, "Title is required")
@@ -91,11 +95,13 @@ const AddExpense = () => {
         handleSubmit,
         control,
         formState: { errors },
+        setValue,
     } = useForm({
         resolver: zodResolver(formSchema),
         mode: "all",
         defaultValues: {
-            category: "Food",
+            type: "expense",
+            category: "",
             title: "",
             desc: "",
             amount: "",
@@ -106,8 +112,9 @@ const AddExpense = () => {
 
     const onSubmit = async (data) => {
         try {
-            const response = await addExpense(
+            const response = await addTransaction(
                 currentUser.id,
+                data.type,
                 data.category,
                 data.title,
                 data.desc,
@@ -130,12 +137,12 @@ const AddExpense = () => {
             <Card
                 elevation={1}
                 sx={{
-                    mt: 4,
+                    my: 4,
                     maxWidth: 550,
                     width: mobileView ? "100%" : largeView ? "50%" : "75%",
                 }}
             >
-                <CardHeader title="Add Expense" />
+                <CardHeader title="Add Transaction" />
                 <CardContent>
                     <Box
                         component="form"
@@ -149,6 +156,34 @@ const AddExpense = () => {
                         onSubmit={handleSubmit(onSubmit)}
                     >
                         <FormControl>
+                            <Controller
+                                name="type"
+                                control={control}
+                                render={({ field }) => (
+                                    <RadioGroup
+                                        {...field}
+                                        row
+                                        onChange={(event, value) => {
+                                            setValue("category", "")
+                                            field.onChange(value)
+                                            setTransactionType(value)
+                                        }}
+                                    >
+                                        <FormControlLabel
+                                            value="expense"
+                                            control={<Radio />}
+                                            label="Expense"
+                                        />
+                                        <FormControlLabel
+                                            value="earning"
+                                            control={<Radio />}
+                                            label="Earning"
+                                        />
+                                    </RadioGroup>
+                                )}
+                            ></Controller>
+                        </FormControl>
+                        <FormControl required error={!!errors.category}>
                             <InputLabel id="category">Category</InputLabel>
                             <Controller
                                 name="category"
@@ -159,26 +194,36 @@ const AddExpense = () => {
                                         required
                                         labelId="category"
                                         label="Category"
+                                    
                                     >
-                                        {categories.map((category) => (
-                                            <MenuItem
-                                                key={category.name}
-                                                value={category.name}
-                                            >
-                                                <Box
-                                                    component="span"
-                                                    display="flex"
-                                                    gap={2}
+                                        {categories
+                                            .filter((category) =>
+                                                transactionType === "expense"
+                                                    ? category.type ===
+                                                      "expense"
+                                                    : category.type ===
+                                                      "earning"
+                                            )
+                                            .map((category) => (
+                                                <MenuItem
+                                                    aria-required
+                                                    key={category.name}
+                                                    value={category.name}
                                                 >
-                                                    {category.icon}
-                                                    {category.name}
-                                                </Box>
-                                            </MenuItem>
-                                        ))}
+                                                    <Box
+                                                        component="span"
+                                                        display="flex"
+                                                        gap={2}
+                                                    >
+                                                        {category.icon}
+                                                        {category.name}
+                                                    </Box>
+                                                </MenuItem>
+                                            ))}
                                     </Select>
                                 )}
                             ></Controller>
-                            <FormHelperText error={!!errors.category}>
+                            <FormHelperText>
                                 {errors.category
                                     ? errors?.category.message
                                     : ""}
@@ -361,4 +406,4 @@ const AddExpense = () => {
     )
 }
 
-export default AddExpense
+export default AddTransaction

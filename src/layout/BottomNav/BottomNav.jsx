@@ -1,14 +1,22 @@
 import { Link, useLocation } from "react-router-dom"
 import { Paper, BottomNavigation, BottomNavigationAction } from "@mui/material"
-import { Home, Money, QueryStats, AccountBox } from "@mui/icons-material"
-import { useState } from "react"
+import {
+    Home as HomeIcon,
+    ReceiptLong as TransactionsIcon,
+    QueryStats as StatsIcon,
+    AccountBox as AccountIcon,
+} from "@mui/icons-material"
 
 // navbar
 const navLinks = [
-    { label: "Home", route: "/", icon: <Home /> },
-    { label: "Expenses", route: "/expenses", icon: <Money /> },
-    { label: "Stats", route: "/stats", icon: <QueryStats /> },
-    { label: "Account", route: "/account", icon: <AccountBox /> },
+    { label: "Home", route: "/", icon: <HomeIcon /> },
+    {
+        label: "Transactions",
+        route: "/transactions",
+        icon: <TransactionsIcon />,
+    },
+    { label: "Stats", route: "/stats", icon: <StatsIcon /> },
+    { label: "Account", route: "/account", icon: <AccountIcon /> },
 ]
 
 const BottomNav = () => {
@@ -20,14 +28,14 @@ const BottomNav = () => {
         >
             <BottomNavigation
                 showLabels
-                value={location.pathname}
+                value={location.pathname.split("/")[1] || "/"}
             >
                 {navLinks.map((navLink) => (
                     <BottomNavigationAction
                         key={navLink.label}
                         LinkComponent={Link}
                         to={navLink.route}
-                        value={navLink.route}
+                        value={navLink.route.split("/")[1] || "/"}
                         label={navLink.label}
                         icon={navLink.icon}
                     />
