@@ -18,7 +18,7 @@ export const fetchExpenses = async (userId) => {
         let user
         const userSnap = await getDoc(doc(db, "user", userId))
         if (!userSnap.exists()) {
-            return { msg: "No user record has been found."}
+            return { msg: "No user record has been found." }
         }
         user = userSnap.data()
         const expenseQuery = query(
@@ -27,6 +27,27 @@ export const fetchExpenses = async (userId) => {
         )
         const userExpensesSnap = await getDocs(expenseQuery)
         return userExpensesSnap.docs.map((doc) => ({
+            ...doc.data(),
+            date: doc.data().date.seconds,
+        }))
+    } catch (error) {
+        return error
+    }
+}
+export const fetchEarnings = async (userId) => {
+    try {
+        let user
+        const userSnap = await getDoc(doc(db, "user", userId))
+        if (!userSnap.exists()) {
+            return { msg: "No user record has been found." }
+        }
+        user = userSnap.data()
+        const earningQuery = query(
+            collection(db, "earning"),
+            where(documentId(), "in", user.earnings)
+        )
+        const userEarningsSnap = await getDocs(earningQuery)
+        return userEarningsSnap.docs.map((doc) => ({
             ...doc.data(),
             date: doc.data().date.seconds,
         }))

@@ -12,7 +12,7 @@ export const expenseApi = api.injectEndpoints({
                     return { error }
                 }
             },
-            providesTags: ["Expenses"],
+            providesTags: ["UserExpenses"],
         }),
     }),
 })

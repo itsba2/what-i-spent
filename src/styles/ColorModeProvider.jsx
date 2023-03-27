@@ -1,28 +1,6 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles"
-import { useMemo, useState, createContext, useContext, forwardRef } from "react"
-import { Link as RouterLink } from "react-router-dom"
-import PropTypes from "prop-types"
-
-const LinkBehavior = forwardRef((props, ref) => {
-    const { href, ...other } = props
-    return (
-        <RouterLink
-            ref={ref}
-            to={href}
-            {...other}
-        />
-    )
-})
-LinkBehavior.propTypes = {
-    href: PropTypes.oneOfType([
-        PropTypes.shape({
-            hash: PropTypes.string,
-            pathname: PropTypes.string,
-            search: PropTypes.string,
-        }),
-        PropTypes.string,
-    ]).isRequired,
-}
+import { useMemo, useState, createContext, useContext } from "react"
+import LinkBehavior from "./LinkBehavior"
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} })
 

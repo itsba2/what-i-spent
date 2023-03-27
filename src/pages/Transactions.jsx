@@ -1,50 +1,68 @@
-import {
-    Box,
-    Card,
-    CardContent,
-    CardHeader,
-    Fab,
-    Stack,
-    Typography,
-} from "@mui/material"
+import { Box, Fab, Tab, Tabs } from "@mui/material"
 import { Add as AddIcon } from "@mui/icons-material"
 import { useAuth } from "../auth/AuthProvider"
 import { useFetchUserExpensesQuery } from "../app/services/expenseApi"
+import { useFetchUserEarningsQuery } from "../app/services/earningApi"
+import { useState } from "react"
+import TabPanel from "../components/TabPanel"
 
 const Transactions = () => {
     const { currentUser } = useAuth()
+    const [tabValue, setTabValue] = useState(0)
+
+    const tabProps = (index) => ({
+        id: `tab-${index}`,
+        "aria-controls": `tabpanel-${index}`,
+    })
 
     const {
-        data: transactions,
-        isLoading,
-        isSuccess,
+        data: userExpenses,
+        isLoading: loadingUserExpenses,
+        isSuccess: userExpensesFetched,
     } = useFetchUserExpensesQuery(currentUser.id)
+    const {
+        data: userEarnings,
+        isLoading: loadingUserEarnings,
+        isSuccess: userEarningsFetched,
+    } = useFetchUserEarningsQuery(currentUser.id)
 
     return (
         <>
-            <Box
-                display="flex"
-                flexDirection="column"
-                width="100%"
-            >
-                <Typography variant="h5" textAlign="center">Transactions</Typography>
-                <Box>
-                    {isSuccess && (
-                        <Stack spacing={1}>
-                            {transactions.map((transaction, index) => (
-                                <Card key={`transaction${index}`}>
-                                    <CardHeader title={transaction.title} />
-                                    <CardContent>
-                                        <Box component="p">{`${transaction.amount} ${transaction.currency}`}</Box>
-                                        <Box component="p">
-                                            {transaction.category}
-                                        </Box>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </Stack>
-                    )}
-                </Box>
+            <Box width="100%">
+                <Tabs
+                    // centered
+                    variant="fullWidth"
+                    value={tabValue}
+                    onChange={(event, newTabValue) => setTabValue(newTabValue)}
+                >
+                    <Tab
+                        label="Expenses"
+                        {...tabProps(0)}
+                    />
+                    <Tab
+                        label="Earnings"
+                        {...tabProps(1)}
+                    />
+                    <Tab
+                        label="Summary"
+                        {...tabProps(2)}
+                    />
+                </Tabs>
+                <TabPanel
+                    transactions={userExpenses}
+                    tabValue={tabValue}
+                    tabIndex={0}
+                />
+                <TabPanel
+                    transactions={userEarnings}
+                    tabValue={tabValue}
+                    tabIndex={1}
+                />
+                <TabPanel
+                    transactions={[]}
+                    tabValue={tabValue}
+                    tabIndex={2}
+                />
             </Box>
             <Fab
                 color="secondary"
