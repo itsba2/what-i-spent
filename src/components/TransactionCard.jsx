@@ -10,7 +10,6 @@ import {
     Typography,
     Grid,
 } from "@mui/material"
-
 import {
     ExpandLess as LessIcon,
     ExpandMore as MoreIcon,
@@ -19,7 +18,9 @@ import {
 import dayjs from "dayjs"
 import { useState } from "react"
 
-const TransactionItem = ({ transaction }) => {
+import currencies from "../helpers/currency.json"
+
+const TransactionCard = ({ transaction }) => {
     const [expand, setExpand] = useState(false)
     return (
         <Card sx={{ display: "flex", flexDirection: "column" }}>
@@ -39,7 +40,8 @@ const TransactionItem = ({ transaction }) => {
                     >
                         <Grid
                             item
-                            xs={2}
+                            xs={3}
+                            sm={2}
                         >
                             <Box
                                 component="div"
@@ -59,7 +61,8 @@ const TransactionItem = ({ transaction }) => {
                         </Grid>
                         <Grid
                             item
-                            xs={6}
+                            xs={5}
+                            sm={6}
                         >
                             <Box
                                 component="div"
@@ -81,15 +84,20 @@ const TransactionItem = ({ transaction }) => {
                         <Grid
                             item
                             xs={4}
+                            sm={4}
                             textAlign="end"
                         >
-                            <Typography variant="body1">{`${transaction.currency} ${transaction.amount}`}</Typography>
+                            <Typography variant="body1">{`${
+                                currencies.find(
+                                    (currency) =>
+                                        currency.code === transaction.currency
+                                ).symbol
+                            }${transaction.amount}`}</Typography>
                         </Grid>
                     </Grid>
                 </CardContent>
                 <CardActions sx={{ display: "flex", flexDirection: "column" }}>
-                    <IconButton>
-                        {/* TODO: edit operation */}
+                    <IconButton href={`/transactions/edit/${transaction.id}`}>
                         <EditIcon />
                     </IconButton>
                     <IconButton onClick={() => setExpand((prev) => !prev)}>
@@ -129,4 +137,4 @@ const toYear = (timestamp) => {
     return dayjs.unix(timestamp).format("YYYY")
 }
 
-export default TransactionItem
+export default TransactionCard

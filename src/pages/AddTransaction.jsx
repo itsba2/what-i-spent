@@ -21,20 +21,21 @@ import {
     FormControlLabel,
 } from "@mui/material"
 import { Add as AddIcon, Close as CancelIcon } from "@mui/icons-material"
+import { DatePicker } from "@mui/x-date-pickers"
 import { useState } from "react"
-import { resolveFirebaseError } from "../helpers/helpers"
-import categories from "../helpers/categories"
-import { useAuth } from "../auth/AuthProvider"
 import { useNavigate } from "react-router-dom"
-import Feedback from "../components/Feedback"
+import dayjs, { isDayjs } from "dayjs"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import zod from "zod"
-import { DatePicker } from "@mui/x-date-pickers"
-import dayjs, { isDayjs } from "dayjs"
+
+import Feedback from "../components/Feedback"
 import AmountFormat from "../components/AmountFormat"
 import currencies from "../helpers/currency.json"
+import { resolveFirebaseError } from "../helpers/helpers"
+import categories from "../helpers/categories"
 import { addTransaction } from "../firebase/transaction"
+import { useAuth } from "../auth/AuthProvider"
 
 const initialFeedback = { type: "error", show: false, msg: "" }
 
@@ -58,10 +59,10 @@ const AddTransaction = () => {
             title: zod
                 .string()
                 .min(1, "Title is required")
-                .max(61, "Title is too long."),
+                .max(32, "Title is too long."),
             desc: zod
                 .string()
-                .max(100, "Description cannot be longer than 100 characters")
+                .max(128, "Description cannot be longer than 128 characters")
                 .optional(),
             amount: zod.string().min(1, "Amount is required"),
             currency: zod.string(),

@@ -27,6 +27,8 @@ export const fetchExpenses = async (userId) => {
         )
         const userExpensesSnap = await getDocs(expenseQuery)
         return userExpensesSnap.docs.map((doc) => ({
+            type: "expense",
+            id: doc.id,
             ...doc.data(),
             date: doc.data().date.seconds,
         }))
@@ -48,6 +50,8 @@ export const fetchEarnings = async (userId) => {
         )
         const userEarningsSnap = await getDocs(earningQuery)
         return userEarningsSnap.docs.map((doc) => ({
+            type: "expense",
+            id: doc.id,
             ...doc.data(),
             date: doc.data().date.seconds,
         }))

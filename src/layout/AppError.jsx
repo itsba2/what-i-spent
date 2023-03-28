@@ -9,7 +9,6 @@ import TopBar from "./TopBar/TopBar"
 
 const AppError = () => {
     const error = useRouteError()
-    console.log(error)
     return (
         <>
             <CssBaseline enableColorScheme />

@@ -12,8 +12,17 @@ const BackButton = () => {
     const goBack = () => {
         let currentPathArray = location.pathname.split("/")
         currentPathArray.pop()
-        const backPath =
-            currentPathArray.length < 2 ? "/" : currentPathArray.join("/")
+        let backPath
+        if (currentPathArray.length < 2) {
+            backPath = "/"
+        } else if (currentPathArray.includes("edit")) {
+            // if path is /transactions/edit/:id, directly return to /transactions, not /transactions/edit
+            const index = currentPathArray.indexOf("edit")
+            currentPathArray.splice(index)
+            backPath = currentPathArray.join("/")
+        } else {
+            backPath = currentPathArray.join("/")
+        }
 
         navigate(backPath)
     }
