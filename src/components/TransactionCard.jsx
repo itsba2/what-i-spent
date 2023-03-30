@@ -1,27 +1,60 @@
 import {
     Box,
     Card,
-    CardHeader,
     CardContent,
     CardActions,
-    CardActionArea,
     IconButton,
     Collapse,
     Typography,
     Grid,
+    Menu,
+    MenuItem,
+    Button,
 } from "@mui/material"
 import {
     ExpandLess as LessIcon,
     ExpandMore as MoreIcon,
     Edit as EditIcon,
+    MoreVert as Dot3Icon,
+    Delete as DeleteIcon,
 } from "@mui/icons-material"
 import dayjs from "dayjs"
 import { useState } from "react"
 
 import currencies from "../helpers/currency.json"
+import { useDeleteExpenseMutation } from "../app/services/expenseApi"
+import { useDeleteEarningMutation } from "../app/services/earningApi"
+import { useAuth } from "../auth/AuthProvider"
 
 const TransactionCard = ({ transaction }) => {
+    const { currentUser } = useAuth()
     const [expand, setExpand] = useState(false)
+    const [moreEl, setMoreEl] = useState(null)
+    const openMore = Boolean(moreEl)
+
+    const [deleteExpense, { isLoading: deletingExpense }] =
+        useDeleteExpenseMutation()
+    const [deleteEarning, { isLoading: deletingEarning }] =
+        useDeleteEarningMutation()
+
+    const handleDeleteTransaction = async () => {
+        try {
+            if (transaction.type === "expense") {
+                await deleteExpense({
+                    userId: currentUser.id,
+                    docId: transaction.id,
+                })
+            } else if (transaction.type === "earning") {
+                await deleteEarning({
+                    userId: currentUser.id,
+                    docId: transaction.id,
+                })
+            }
+            setMoreEl(null)
+        } catch (error) {
+            console.log(error)
+        }
+    }
     return (
         <Card sx={{ display: "flex", flexDirection: "column" }}>
             <Box
@@ -40,8 +73,8 @@ const TransactionCard = ({ transaction }) => {
                     >
                         <Grid
                             item
-                            xs={3}
-                            sm={2}
+                            xs={4}
+                            sm={3}
                         >
                             <Box
                                 component="div"
@@ -61,8 +94,8 @@ const TransactionCard = ({ transaction }) => {
                         </Grid>
                         <Grid
                             item
-                            xs={5}
-                            sm={6}
+                            xs={4}
+                            sm={5}
                         >
                             <Box
                                 component="div"
@@ -96,10 +129,53 @@ const TransactionCard = ({ transaction }) => {
                         </Grid>
                     </Grid>
                 </CardContent>
-                <CardActions sx={{ display: "flex", flexDirection: "column" }}>
-                    <IconButton href={`/transactions/edit/${transaction.id}`}>
-                        <EditIcon />
+                <CardActions
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "end",
+                    }}
+                >
+                    <IconButton
+                        aria-label="more"
+                        id="long-button"
+                        aria-controls={openMore ? "long-menu" : undefined}
+                        aria-expanded={openMore ? "true" : undefined}
+                        aria-haspopup="true"
+                        onClick={(event) => setMoreEl(event.currentTarget)}
+                    >
+                        <Dot3Icon />
                     </IconButton>
+                    <Menu
+                        id="long-menu"
+                        MenuListProps={{ "aria-labelledby": "long-button" }}
+                        anchorEl={moreEl}
+                        open={openMore}
+                        onClose={() => setMoreEl(null)}
+                    >
+                        <MenuItem
+                            divider
+                            disableGutters
+                        >
+                            <Button
+                                href={`/transactions/edit/${transaction.id}`}
+                                startIcon={<EditIcon />}
+                                fullWidth
+                                disableElevation
+                            >
+                                Edit
+                            </Button>
+                        </MenuItem>
+                        <MenuItem disableGutters>
+                            <Button
+                                fullWidth
+                                startIcon={<DeleteIcon />}
+                                onClick={handleDeleteTransaction}
+                            >
+                                Delete
+                            </Button>
+                        </MenuItem>
+                    </Menu>
                     <IconButton onClick={() => setExpand((prev) => !prev)}>
                         {expand ? <LessIcon /> : <MoreIcon />}
                     </IconButton>

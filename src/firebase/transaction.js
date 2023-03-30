@@ -2,7 +2,9 @@
 import {
     addDoc,
     arrayUnion,
+    arrayRemove,
     collection,
+    deleteDoc,
     doc,
     documentId,
     getDoc,
@@ -15,12 +17,11 @@ import { db } from "./config"
 
 export const fetchExpenses = async (userId) => {
     try {
-        let user
         const userSnap = await getDoc(doc(db, "user", userId))
         if (!userSnap.exists()) {
             return { msg: "No user record has been found." }
         }
-        user = userSnap.data()
+        const user = userSnap.data()
         const expenseQuery = query(
             collection(db, "expense"),
             where(documentId(), "in", user.expenses)
@@ -38,12 +39,11 @@ export const fetchExpenses = async (userId) => {
 }
 export const fetchEarnings = async (userId) => {
     try {
-        let user
         const userSnap = await getDoc(doc(db, "user", userId))
         if (!userSnap.exists()) {
             return { msg: "No user record has been found." }
         }
-        user = userSnap.data()
+        const user = userSnap.data()
         const earningQuery = query(
             collection(db, "earning"),
             where(documentId(), "in", user.earnings)
@@ -113,6 +113,30 @@ export const addEarning = async ({
         })
 
         return { msg: "Successfully added." }
+    } catch (error) {
+        return error
+    }
+}
+
+export const deleteExpense = async ({ userId, docId }) => {
+    try {
+        await updateDoc(doc(db, "user", userId), {
+            expenses: arrayRemove(docId),
+        })
+        await deleteDoc(doc(db, "expense", docId))
+        return { msg: "Successfully deleted." }
+    } catch (error) {
+        return error
+    }
+}
+
+export const deleteEarning = async (docId) => {
+    try {
+        await updateDoc(doc(db, "user", userId), {
+            earnings: arrayRemove(docId),
+        })
+        await deleteDoc(doc(db, "earning", docId))
+        return { msg: "Successfully deleted." }
     } catch (error) {
         return error
     }

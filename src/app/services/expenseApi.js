@@ -1,4 +1,8 @@
-import { fetchExpenses, addExpense } from "../../firebase/transaction"
+import {
+    fetchExpenses,
+    addExpense,
+    deleteExpense,
+} from "../../firebase/transaction"
 import { api } from "../api"
 
 export const expenseApi = api.injectEndpoints({
@@ -19,6 +23,17 @@ export const expenseApi = api.injectEndpoints({
                 try {
                     await addExpense(data)
                 } catch (error) {
+                    console.log('o ses bu ses')
+                    return { error }
+                }
+            },
+            invalidatesTags: ["UserExpenses"],
+        }),
+        deleteExpense: build.mutation({
+            async queryFn(data) {
+                try {
+                    await deleteExpense(data)
+                } catch (error) {
                     return { error }
                 }
             },
@@ -27,4 +42,8 @@ export const expenseApi = api.injectEndpoints({
     }),
 })
 
-export const { useFetchUserExpensesQuery, useAddNewExpenseMutation } = expenseApi
+export const {
+    useFetchUserExpensesQuery,
+    useAddNewExpenseMutation,
+    useDeleteExpenseMutation,
+} = expenseApi

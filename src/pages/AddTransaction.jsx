@@ -141,7 +141,12 @@ const AddTransaction = () => {
                     date: dayjs(data.date).toDate(),
                 })
             }
-            setFeedback({ type: "success", show: true, msg: "Successfully added." })
+            setFeedback({
+                type: "success",
+                show: true,
+                msg: "Successfully added.",
+            })
+            navigate(-1)
         } catch (error) {
             setFeedback({
                 type: "error",

@@ -1,4 +1,8 @@
-import { fetchEarnings, addEarning } from "../../firebase/transaction"
+import {
+    fetchEarnings,
+    addEarning,
+    deleteEarning,
+} from "../../firebase/transaction"
 import { api } from "../api"
 
 export const expenseApi = api.injectEndpoints({
@@ -18,6 +22,18 @@ export const expenseApi = api.injectEndpoints({
             async queryFn(data) {
                 try {
                     const response = await addEarning(data)
+                    return response
+                } catch (error) {
+                    return { error }
+                }
+            },
+            invalidatesTags: ["UserEarnings"],
+        }),
+        deleteEarning: build.mutation({
+            async queryFn(docId) {
+                try {
+                    const response = await deleteEarning(docId)
+                    return response
                 } catch (error) {
                     return { error }
                 }
@@ -27,4 +43,8 @@ export const expenseApi = api.injectEndpoints({
     }),
 })
 
-export const { useFetchUserEarningsQuery, useAddNewEarningMutation } = expenseApi
+export const {
+    useFetchUserEarningsQuery,
+    useAddNewEarningMutation,
+    useDeleteEarningMutation,
+} = expenseApi
