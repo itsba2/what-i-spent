@@ -60,45 +60,58 @@ export const fetchEarnings = async (userId) => {
     }
 }
 
-export const addTransaction = async (
+export const addExpense = async ({
     userId,
-    type,
     category,
     title,
     desc,
     amount,
     currency,
-    date
-) => {
+    date,
+}) => {
     try {
-        let newTransaction
-        if (type === "expense") {
-            newTransaction = await addDoc(collection(db, "expense"), {
-                userId,
-                category,
-                title,
-                desc,
-                amount,
-                currency,
-                date,
-            })
-            await updateDoc(doc(db, "user", userId), {
-                expenses: arrayUnion(newTransaction.id),
-            })
-        } else if (type === "earning") {
-            newTransaction = await addDoc(collection(db, "earning"), {
-                userId,
-                category,
-                title,
-                desc,
-                amount,
-                currency,
-                date,
-            })
-            await updateDoc(doc(db, "user", userId), {
-                earnings: arrayUnion(newTransaction.id),
-            })
-        }
+        const newExpense = await addDoc(collection(db, "expense"), {
+            userId,
+            category,
+            title,
+            desc,
+            amount,
+            currency,
+            date,
+        })
+        await updateDoc(doc(db, "user", userId), {
+            expenses: arrayUnion(newExpense.id),
+        })
+
+        return { msg: "Successfully added." }
+    } catch (error) {
+        return error
+    }
+}
+
+export const addEarning = async ({
+    userId,
+    category,
+    title,
+    desc,
+    amount,
+    currency,
+    date,
+}) => {
+    try {
+        const newEarning = await addDoc(collection(db, "earning"), {
+            userId,
+            category,
+            title,
+            desc,
+            amount,
+            currency,
+            date,
+        })
+        await updateDoc(doc(db, "user", userId), {
+            earnings: arrayUnion(newEarning.id),
+        })
+
         return { msg: "Successfully added." }
     } catch (error) {
         return error

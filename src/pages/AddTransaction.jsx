@@ -34,8 +34,9 @@ import AmountFormat from "../components/AmountFormat"
 import currencies from "../helpers/currency.json"
 import { resolveFirebaseError } from "../helpers/helpers"
 import categories from "../helpers/categories"
-import { addTransaction } from "../firebase/transaction"
 import { useAuth } from "../auth/AuthProvider"
+import { useAddNewExpenseMutation } from "../app/services/expenseApi"
+import { useAddNewEarningMutation } from "../app/services/earningApi"
 
 const initialFeedback = { type: "error", show: false, msg: "" }
 
@@ -111,19 +112,36 @@ const AddTransaction = () => {
         },
     })
 
+    const [addExpense, { isLoading: addingNewExpense }] =
+        useAddNewExpenseMutation()
+    const [addEarning, { isLoading: addingNewEarning }] =
+        useAddNewEarningMutation()
+
     const onSubmit = async (data) => {
         try {
-            const response = await addTransaction(
-                currentUser.id,
-                data.type,
-                data.category,
-                data.title,
-                data.desc,
-                parseFloat(data.amount).toFixed(2),
-                data.currency,
-                dayjs(data.date).toDate()
-            )
-            setFeedback({ type: "success", show: true, msg: response.msg })
+            let response
+            if (data.type === "expense") {
+                response = await addExpense({
+                    userId: currentUser.id,
+                    category: data.category,
+                    title: data.title,
+                    desc: data.desc,
+                    amount: parseFloat(data.amount).toFixed(2),
+                    currency: data.currency,
+                    date: dayjs(data.date).toDate(),
+                })
+            } else if (data.type === "earning") {
+                response = await addEarning({
+                    userId: currentUser.id,
+                    category: data.category,
+                    title: data.title,
+                    desc: data.desc,
+                    amount: parseFloat(data.amount).toFixed(2),
+                    currency: data.currency,
+                    date: dayjs(data.date).toDate(),
+                })
+            }
+            setFeedback({ type: "success", show: true, msg: "Successfully added." })
         } catch (error) {
             setFeedback({
                 type: "error",
@@ -184,7 +202,10 @@ const AddTransaction = () => {
                                 )}
                             />
                         </FormControl>
-                        <FormControl required error={!!errors.category}>
+                        <FormControl
+                            required
+                            error={!!errors.category}
+                        >
                             <InputLabel id="category">Category</InputLabel>
                             <Controller
                                 name="category"
@@ -195,7 +216,6 @@ const AddTransaction = () => {
                                         required
                                         labelId="category"
                                         label="Category"
-                                    
                                     >
                                         {categories
                                             .filter((category) =>
