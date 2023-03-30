@@ -115,7 +115,7 @@ const ResetPassword = () => {
                                     }
                                 />
                             )}
-                        ></Controller>
+                        />
                         <Button
                             variant="contained"
                             startIcon={<ResetIcon />}

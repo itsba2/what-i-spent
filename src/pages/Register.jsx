@@ -149,7 +149,7 @@ const Register = () => {
                                     }
                                 />
                             )}
-                        ></Controller>
+                        />
                         <Controller
                             name="password"
                             control={control}
@@ -186,7 +186,7 @@ const Register = () => {
                                     }
                                 />
                             )}
-                        ></Controller>
+                        />
                         <Controller
                             name="confirm"
                             control={control}
@@ -223,7 +223,7 @@ const Register = () => {
                                     }
                                 />
                             )}
-                        ></Controller>
+                        />
                         <Controller
                             name="username"
                             control={control}
@@ -241,7 +241,7 @@ const Register = () => {
                                     }
                                 />
                             )}
-                        ></Controller>
+                        />
                         <Button
                             variant="contained"
                             type="submit"

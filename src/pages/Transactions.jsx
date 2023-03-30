@@ -1,22 +1,24 @@
 import {
     Box,
-    Fab,
     Tab,
     Tabs,
     SpeedDial,
     SpeedDialIcon,
     SpeedDialAction,
+    CircularProgress,
 } from "@mui/material"
 import { Add as AddIcon, FilterAlt as FilterIcon } from "@mui/icons-material"
+import { useMemo, useState } from "react"
 import { useAuth } from "../auth/AuthProvider"
+
+import { createSelector } from "@reduxjs/toolkit"
 import { useFetchUserExpensesQuery } from "../app/services/expenseApi"
 import { useFetchUserEarningsQuery } from "../app/services/earningApi"
-import { useState } from "react"
+
 import TabTransactionPanel from "../components/TabTransactionPanel"
 import TabSummaryPanel from "../components/TabSummaryPanel"
 import TransactionFilter from "../components/TransactionFilter"
-import Stats from "../helpers/Stats"
-import Filter from "../helpers/Filter"
+import dayjs from "dayjs"
 
 const actions = [
     {
@@ -40,30 +42,105 @@ const Transactions = () => {
         "aria-controls": `tabtransactionpanel-${index}`,
     })
 
-    const {
-        data: userExpenses,
-        isLoading: loadingUserExpenses,
-        isSuccess: userExpensesFetched,
-    } = useFetchUserExpensesQuery(currentUser.id)
-    const {
-        data: userEarnings,
-        isLoading: loadingUserEarnings,
-        isSuccess: userEarningsFetched,
-    } = useFetchUserEarningsQuery(currentUser.id)
-
-    const expenseFilter = new Filter(userExpenses ?? [])
-
     const [showFilterDialog, toggleFilterDialog] = useState(false)
     const [filterOptions, setFilterOptions] = useState({
-        startDate: null,
-        endDate: null,
-        amount: [expenseFilter.minAmount, expenseFilter.maxAmount],
-        min: Math.floor(expenseFilter.minAmount),
-        max: Math.ceil(expenseFilter.maxAmount),
+        startDate: dayjs().startOf("month"),
+        endDate: dayjs().endOf("month"),
+        minAmount: "",
+        maxAmount: "",
+        currency: currentUser.currencyPref,
     })
+
+    // expense filters
+    const { filteredUserExpenses, loadingUserExpenses, userExpensesFetched } =
+        useFetchUserExpensesQuery(currentUser.id, {
+            selectFromResult: ({ data, isLoading, isSuccess }) => {
+                const filteredData =
+                    data?.filter((expense) => {
+                        const dateAfterStartDate = dayjs
+                            .unix(expense.date)
+                            .isAfter(filterOptions.startDate)
+                        const dateBeforeEndDate = dayjs
+                            .unix(expense.date)
+                            .isBefore(filterOptions.endDate)
+                        const amountLargerThanMin = filterOptions.minAmount
+                            .length
+                            ? parseFloat(expense.amount) >=
+                              filterOptions.minAmount
+                            : true
+                        const amountSmallerThanMax = filterOptions.maxAmount
+                            .length
+                            ? parseFloat(expense.amount) <=
+                              filterOptions.maxAmount
+                            : true
+                        const selectedCurrency =
+                            filterOptions.currency === "None"
+                                ? true
+                                : expense.currency === filterOptions.currency
+                        return (
+                            dateAfterStartDate &&
+                            dateBeforeEndDate &&
+                            amountLargerThanMin &&
+                            amountSmallerThanMax &&
+                            selectedCurrency
+                        )
+                    }) || []
+                return {
+                    filteredUserExpenses: filteredData,
+                    loadingUserExpenses: isLoading,
+                    userExpensesFetched: isSuccess,
+                }
+            },
+        })
+    // earning filters
+    const { filteredUserEarnings, loadingUserEarnings, userEarningsFetched } =
+        useFetchUserEarningsQuery(currentUser.id, {
+            selectFromResult: ({ data, isLoading, isSuccess }) => {
+                const filteredData =
+                    data?.filter((expense) => {
+                        const dateAfterStartDate = dayjs
+                            .unix(expense.date)
+                            .isAfter(filterOptions.startDate)
+                        const dateBeforeEndDate = dayjs
+                            .unix(expense.date)
+                            .isBefore(filterOptions.endDate)
+                        const amountLargerThanMin = filterOptions.minAmount
+                            .length
+                            ? parseFloat(expense.amount) >=
+                              filterOptions.minAmount
+                            : true
+                        const amountSmallerThanMax = filterOptions.maxAmount
+                            .length
+                            ? parseFloat(expense.amount) <=
+                              filterOptions.maxAmount
+                            : true
+                        const selectedCurrency =
+                            filterOptions.currency === "None"
+                                ? true
+                                : expense.currency === filterOptions.currency
+                        return (
+                            dateAfterStartDate &&
+                            dateBeforeEndDate &&
+                            amountLargerThanMin &&
+                            amountSmallerThanMax &&
+                            selectedCurrency
+                        )
+                    }) || []
+                return {
+                    filteredUserEarnings: filteredData,
+                    loadingUserEarnings: isLoading,
+                    userEarningsFetched: isSuccess,
+                }
+            },
+        })
 
     return (
         <>
+            {loadingUserExpenses && loadingUserEarnings && (
+                <CircularProgress
+                    sx={{ position: "absolute", top: "50%", bototm: "50%" }}
+                />
+            )}
             <Box width="100%">
                 <Tabs
                     variant="fullWidth"
@@ -84,12 +161,14 @@ const Transactions = () => {
                     />
                 </Tabs>
                 <TabTransactionPanel
-                    transactions={userExpenses}
+                    transactions={filteredUserExpenses}
+                    fetched={userExpensesFetched}
                     tabValue={tabValue}
                     tabIndex={0}
                 />
                 <TabTransactionPanel
-                    transactions={userEarnings}
+                    transactions={filteredUserEarnings}
+                    fetched={userEarningsFetched}
                     tabValue={tabValue}
                     tabIndex={1}
                 />

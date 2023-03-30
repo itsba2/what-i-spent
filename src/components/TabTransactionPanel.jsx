@@ -1,8 +1,8 @@
-import { Grid, Stack } from "@mui/material"
+import { Grid, Stack, Typography } from "@mui/material"
 import TransactionCard from "./TransactionCard"
 
 const TabTransactionPanel = (props) => {
-    const { transactions, tabValue, tabIndex, ...other } = props
+    const { transactions, fetched, tabValue, tabIndex, ...other } = props
     return (
         <div
             role="tabtransactionpanel"
@@ -23,17 +23,30 @@ const TabTransactionPanel = (props) => {
                         md={8}
                         lg={6}
                     >
-                        <Stack
-                            spacing={1}
-                            marginTop={2}
-                        >
-                            {transactions?.map((transaction, index) => (
-                                <TransactionCard
-                                    transaction={transaction}
-                                    key={`transaction-${index}`}
-                                />
+                        {fetched &&
+                            (transactions.length ? (
+                                <Stack
+                                    spacing={1}
+                                    marginTop={2}
+                                >
+                                    {transactions?.map((transaction, index) => (
+                                        <TransactionCard
+                                            transaction={transaction}
+                                            key={`transaction-${index}`}
+                                        />
+                                    ))}
+                                </Stack>
+                            ) : (
+                                <Typography
+                                    variant="body2"
+                                    color="grey"
+                                    fontStyle="italic"
+                                    marginTop={2}
+                                    textAlign="center"
+                                >
+                                    Nothing to display.
+                                </Typography>
                             ))}
-                        </Stack>
                     </Grid>
                 </Grid>
             )}

@@ -4,6 +4,7 @@ import { api } from "./api"
 
 export const store = configureStore({
     reducer: {
+        // TODO: loading/feedback slice
         [api.reducerPath]: api.reducer,
     },
     middleware: (dMw) => dMw().concat(api.middleware),

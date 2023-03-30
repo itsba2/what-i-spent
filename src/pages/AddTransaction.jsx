@@ -107,7 +107,7 @@ const AddTransaction = () => {
             desc: "",
             amount: "",
             currency: currentUser.currencyPref,
-            date: dayjs(new Date()),
+            date: dayjs(),
         },
     })
 
@@ -182,7 +182,7 @@ const AddTransaction = () => {
                                         />
                                     </RadioGroup>
                                 )}
-                            ></Controller>
+                            />
                         </FormControl>
                         <FormControl required error={!!errors.category}>
                             <InputLabel id="category">Category</InputLabel>
@@ -223,7 +223,7 @@ const AddTransaction = () => {
                                             ))}
                                     </Select>
                                 )}
-                            ></Controller>
+                            />
                             <FormHelperText>
                                 {errors.category
                                     ? errors?.category.message
@@ -247,7 +247,7 @@ const AddTransaction = () => {
                                     }
                                 />
                             )}
-                        ></Controller>
+                        />
                         <Controller
                             name="desc"
                             control={control}
@@ -263,7 +263,7 @@ const AddTransaction = () => {
                                     }
                                 />
                             )}
-                        ></Controller>
+                        />
                         <Grid
                             container
                             spacing={2}
@@ -299,7 +299,7 @@ const AddTransaction = () => {
                                             }
                                         />
                                     )}
-                                ></Controller>
+                                />
                             </Grid>
                             <Grid
                                 item
@@ -344,7 +344,7 @@ const AddTransaction = () => {
                                             )}
                                         />
                                     )}
-                                ></Controller>
+                                />
                             </Grid>
                         </Grid>
                         <Controller
@@ -373,7 +373,7 @@ const AddTransaction = () => {
                                     }}
                                 />
                             )}
-                        ></Controller>
+                        />
                         <CardActions
                             sx={{
                                 display: "flex",

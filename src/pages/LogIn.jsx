@@ -121,7 +121,7 @@ const LogIn = () => {
                                     }
                                 />
                             )}
-                        ></Controller>
+                        />
                         <Controller
                             name="password"
                             control={control}
@@ -158,7 +158,7 @@ const LogIn = () => {
                                     }
                                 />
                             )}
-                        ></Controller>
+                        />
 
                         <Button
                             variant="contained"

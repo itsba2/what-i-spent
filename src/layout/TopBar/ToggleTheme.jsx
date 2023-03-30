@@ -8,7 +8,10 @@ const ToggleTheme = () => {
     const colorMode = useColorMode()
 
     return (
-        <IconButton color="inherit" onClick={colorMode.toggleColorMode}>
+        <IconButton
+            color="inherit"
+            onClick={colorMode.toggleColorMode}
+        >
             {theme.palette.mode === "dark" ? (
                 <LightModeOutlined />
             ) : (

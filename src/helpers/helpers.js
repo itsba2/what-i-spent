@@ -1,7 +1,3 @@
-export const classNames = (...classes) => {
-    return classes.filter(Boolean).join(" ")
-}
-
 export const resolveFirebaseError = (code) => {
     const errors = [
         {
