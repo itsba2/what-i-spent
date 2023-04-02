@@ -44,11 +44,11 @@ const Transactions = () => {
 
     const [showFilterDialog, toggleFilterDialog] = useState(false)
     const [filterOptions, setFilterOptions] = useState({
-        startDate: dayjs().startOf("month"),
+        startDate: dayjs().startOf("year"),
         endDate: dayjs().endOf("month"),
         minAmount: "",
         maxAmount: "",
-        currency: currentUser.currencyPref,
+        currency: "None",
     })
 
     // expense filters

@@ -3,9 +3,14 @@ import {
     addExpense,
     deleteExpense,
 } from "../../firebase/transaction"
-import { api } from "../api"
 
-export const expenseApi = api.injectEndpoints({
+import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react"
+
+export const expenseApi = createApi({
+    reducerPath: "expenseApi",
+    baseQuery: fakeBaseQuery(),
+    keepUnusedDataFor: 60 * 5,
+    tagTypes: ["Expense"],
     endpoints: (build) => ({
         fetchUserExpenses: build.query({
             async queryFn(userId) {
@@ -16,28 +21,29 @@ export const expenseApi = api.injectEndpoints({
                     return { error }
                 }
             },
-            providesTags: ["UserExpenses"],
+            providesTags: ["Expense"],
         }),
         addNewExpense: build.mutation({
-            async queryFn(data) {
+            async queryFn(expenseData) {
                 try {
-                    await addExpense(data)
+                    const response = await addExpense(expenseData)
+                    return { data: response }
                 } catch (error) {
-                    console.log('o ses bu ses')
                     return { error }
                 }
             },
-            invalidatesTags: ["UserExpenses"],
+            invalidatesTags: ["Expense"],
         }),
         deleteExpense: build.mutation({
-            async queryFn(data) {
+            async queryFn(expenseData) {
                 try {
-                    await deleteExpense(data)
+                    const response = await deleteExpense(expenseData)
+                    return { data: response }
                 } catch (error) {
                     return { error }
                 }
             },
-            invalidatesTags: ["UserExpenses"],
+            invalidatesTags: ["Expense"],
         }),
     }),
 })

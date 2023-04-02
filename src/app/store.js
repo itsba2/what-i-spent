@@ -1,13 +1,16 @@
 import { configureStore } from "@reduxjs/toolkit"
 import { setupListeners } from "@reduxjs/toolkit/query"
-import { api } from "./api"
+import { expenseApi } from "./services/expenseApi"
+import { earningApi } from "./services/earningApi"
 
 export const store = configureStore({
     reducer: {
         // TODO: loading/feedback slice
-        [api.reducerPath]: api.reducer,
+        [expenseApi.reducerPath]: expenseApi.reducer,
+        [earningApi.reducerPath]: earningApi.reducer,
     },
-    middleware: (dMw) => dMw().concat(api.middleware),
+    middleware: (dMw) =>
+        dMw().concat(expenseApi.middleware).concat(earningApi.middleware),
 })
 
 setupListeners(store.dispatch)

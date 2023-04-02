@@ -3,9 +3,14 @@ import {
     addEarning,
     deleteEarning,
 } from "../../firebase/transaction"
-import { api } from "../api"
 
-export const expenseApi = api.injectEndpoints({
+import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react"
+
+export const earningApi = createApi({
+    reducerPath: "earningApi",
+    baseQuery: fakeBaseQuery(),
+    keepUnusedDataFor: 60 * 5,
+    tagTypes: ["Earning"],
     endpoints: (build) => ({
         fetchUserEarnings: build.query({
             async queryFn(userId) {
@@ -16,29 +21,29 @@ export const expenseApi = api.injectEndpoints({
                     return { error }
                 }
             },
-            providesTags: ["UserEarnings"],
+            providesTags: ["Earning"],
         }),
         addNewEarning: build.mutation({
-            async queryFn(data) {
+            async queryFn(earningData) {
                 try {
-                    const response = await addEarning(data)
-                    return response
+                    const response = await addEarning(earningData)
+                    return { data: response }
                 } catch (error) {
                     return { error }
                 }
             },
-            invalidatesTags: ["UserEarnings"],
+            invalidatesTags: ["Earning"],
         }),
         deleteEarning: build.mutation({
-            async queryFn(docId) {
+            async queryFn(earningData) {
                 try {
-                    const response = await deleteEarning(docId)
-                    return response
+                    const response = await deleteEarning(earningData)
+                    return { data: response }
                 } catch (error) {
                     return { error }
                 }
             },
-            invalidatesTags: ["UserEarnings"],
+            invalidatesTags: ["Earning"],
         }),
     }),
 })
@@ -47,4 +52,4 @@ export const {
     useFetchUserEarningsQuery,
     useAddNewEarningMutation,
     useDeleteEarningMutation,
-} = expenseApi
+} = earningApi
