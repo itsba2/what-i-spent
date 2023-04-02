@@ -14,6 +14,7 @@ import {
     where,
 } from "firebase/firestore"
 import { db } from "./config"
+import { chunkArray } from "../helpers/helpers"
 
 export const fetchExpenses = async (userId) => {
     try {
@@ -21,18 +22,28 @@ export const fetchExpenses = async (userId) => {
         if (!userSnap.exists()) {
             return { msg: "No user record has been found." }
         }
-        const user = userSnap.data()
-        const expenseQuery = query(
-            collection(db, "expense"),
-            where(documentId(), "in", user.expenses)
-        )
-        const userExpensesSnap = await getDocs(expenseQuery)
-        return userExpensesSnap.docs.map((doc) => ({
-            type: "expense",
-            id: doc.id,
-            ...doc.data(),
-            date: doc.data().date.seconds,
-        }))
+        const userExpensesChunks = chunkArray(userSnap.data().expenses, 10)
+        let expenseData = []
+        for await (const expenses of userExpensesChunks.map(async (chunk) => {
+            let expenseSnapshots = await getDocs(
+                query(
+                    collection(db, "expense"),
+                    where(documentId(), "in", chunk)
+                )
+            )
+            return expenseSnapshots.docs
+        })) {
+            expenses.forEach((expense) => {
+                expenseData.push({
+                    type: "expense",
+                    id: expense.id,
+                    ...expense.data(),
+                    date: expense.data().date.seconds,
+                })
+            })
+        }
+
+        return expenseData
     } catch (error) {
         return error.code
     }
@@ -43,18 +54,28 @@ export const fetchEarnings = async (userId) => {
         if (!userSnap.exists()) {
             return { msg: "No user record has been found." }
         }
-        const user = userSnap.data()
-        const earningQuery = query(
-            collection(db, "earning"),
-            where(documentId(), "in", user.earnings)
-        )
-        const userEarningsSnap = await getDocs(earningQuery)
-        return userEarningsSnap.docs.map((doc) => ({
-            type: "expense",
-            id: doc.id,
-            ...doc.data(),
-            date: doc.data().date.seconds,
-        }))
+        const userEarningsChunks = chunkArray(userSnap.data().earnings, 10)
+        let earningData = []
+        for await (const earnings of userEarningsChunks.map(async (chunk) => {
+            let earningSnapshots = await getDocs(
+                query(
+                    collection(db, "earning"),
+                    where(documentId(), "in", chunk)
+                )
+            )
+            return earningSnapshots.docs
+        })) {
+            earnings.forEach((earning) => {
+                earningData.push({
+                    type: "earning",
+                    id: earning.id,
+                    ...earning.data(),
+                    date: earning.data().date.seconds,
+                })
+            })
+        }
+
+        return earningData
     } catch (error) {
         return error.code
     }
