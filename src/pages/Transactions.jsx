@@ -45,10 +45,12 @@ const Transactions = () => {
     const [showFilterDialog, toggleFilterDialog] = useState(false)
     const [filterOptions, setFilterOptions] = useState({
         startDate: dayjs().startOf("year"),
-        endDate: dayjs().endOf("month"),
+        endDate: dayjs(),
         minAmount: "",
         maxAmount: "",
         currency: "None",
+        sortKey: "date",
+        sortOrder: "desc",
     })
 
     // expense filters
@@ -85,8 +87,18 @@ const Transactions = () => {
                             selectedCurrency
                         )
                     }) || []
+                const sortedData = filteredData.sort((a, b) => {
+                    const aa = parseFloat(a[filterOptions.sortKey])
+                    const bb = parseFloat(b[filterOptions.sortKey])
+
+                    if (filterOptions.sortOrder === "desc") {
+                        return aa < bb ? 1 : -1
+                    } else if (filterOptions.sortOrder === "asc") {
+                        return aa < bb ? -1 : 1
+                    }
+                })
                 return {
-                    filteredUserExpenses: filteredData,
+                    filteredUserExpenses: sortedData,
                     loadingUserExpenses: isLoading,
                     userExpensesFetched: isSuccess,
                 }
@@ -126,8 +138,18 @@ const Transactions = () => {
                             selectedCurrency
                         )
                     }) || []
+                const sortedData = filteredData.sort((a, b) => {
+                    const aa = parseFloat(a[filterOptions.sortKey])
+                    const bb = parseFloat(b[filterOptions.sortKey])
+
+                    if (filterOptions.sortOrder === "desc") {
+                        return aa < bb ? 1 : -1
+                    } else if (filterOptions.sortOrder === "asc") {
+                        return aa < bb ? -1 : 1
+                    }
+                })
                 return {
-                    filteredUserEarnings: filteredData,
+                    filteredUserEarnings: sortedData,
                     loadingUserEarnings: isLoading,
                     userEarningsFetched: isSuccess,
                 }

@@ -8,6 +8,10 @@ import {
     Autocomplete,
     Grid,
     Box,
+    FormControl,
+    FormControlLabel,
+    RadioGroup,
+    Radio,
 } from "@mui/material"
 import { DatePicker } from "@mui/x-date-pickers"
 import AmountFormat from "../components/AmountFormat"
@@ -31,6 +35,8 @@ const TransactionFilter = ({
             minAmount: zod.string(),
             maxAmount: zod.string(),
             currency: zod.string(),
+            sortKey: zod.string(),
+            sortOrder: zod.string(),
         })
         .superRefine(({ startDate, endDate }, ctx) => {
             if (!startDate) {
@@ -87,6 +93,8 @@ const TransactionFilter = ({
             minAmount: filterOptions.minAmount,
             maxAmount: filterOptions.maxAmount,
             currency: filterOptions.currency,
+            sortKey: filterOptions.sortKey,
+            sortOrder: filterOptions.sortOrder,
         },
     })
 
@@ -106,7 +114,7 @@ const TransactionFilter = ({
                 noValidate
                 onSubmit={handleSubmit(onSubmit)}
             >
-                <DialogTitle>Filter</DialogTitle>
+                <DialogTitle>Sort and Filter</DialogTitle>
                 <DialogContent>
                     <Grid
                         container
@@ -115,6 +123,73 @@ const TransactionFilter = ({
                         marginTop={0}
                         spacing={2}
                     >
+                        <Grid
+                            item
+                            container
+                            justifyContent="center"
+                            xs={12}
+                        >
+                            <Grid
+                                item
+                                xs={6}
+                            >
+                                <FormControl>
+                                    <Controller
+                                        name="sortKey"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <RadioGroup
+                                                {...field}
+                                                onChange={(event, value) => {
+                                                    field.onChange(value)
+                                                }}
+                                            >
+                                                <FormControlLabel
+                                                    value="date"
+                                                    control={<Radio />}
+                                                    label="Date"
+                                                />
+                                                <FormControlLabel
+                                                    value="amount"
+                                                    control={<Radio />}
+                                                    label="Amount"
+                                                />
+                                            </RadioGroup>
+                                        )}
+                                    />
+                                </FormControl>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={6}
+                            >
+                                <FormControl>
+                                    <Controller
+                                        name="sortOrder"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <RadioGroup
+                                                {...field}
+                                                onChange={(event, value) => {
+                                                    field.onChange(value)
+                                                }}
+                                            >
+                                                <FormControlLabel
+                                                    value="asc"
+                                                    control={<Radio />}
+                                                    label="Ascending"
+                                                />
+                                                <FormControlLabel
+                                                    value="desc"
+                                                    control={<Radio />}
+                                                    label="Descending"
+                                                />
+                                            </RadioGroup>
+                                        )}
+                                    />
+                                </FormControl>
+                            </Grid>
+                        </Grid>
                         <Grid
                             item
                             xs={12}
