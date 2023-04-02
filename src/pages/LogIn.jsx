@@ -111,6 +111,7 @@ const LogIn = () => {
                                 <TextField
                                     {...field}
                                     variant="outlined"
+                                    autoComplete="username"
                                     required
                                     label="Email"
                                     error={!!errors.email}
@@ -129,6 +130,7 @@ const LogIn = () => {
                                 <TextField
                                     {...field}
                                     variant="outlined"
+                                    autoComplete="current-password"
                                     type={showPassword ? "text" : "password"}
                                     InputProps={{
                                         endAdornment: (

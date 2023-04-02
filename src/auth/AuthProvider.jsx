@@ -7,8 +7,19 @@ import {
     sendEmailVerification,
     signInWithEmailAndPassword,
     signOut,
+    deleteUser,
+    updateEmail,
+    updatePassword,
+    reauthenticateWithCredential,
+    EmailAuthProvider,
 } from "firebase/auth"
-import { getDoc, doc, setDoc, serverTimestamp } from "firebase/firestore"
+import {
+    getDoc,
+    doc,
+    setDoc,
+    serverTimestamp,
+    updateDoc,
+} from "firebase/firestore"
 
 // imports from files
 import { auth, db } from "../firebase/config"
@@ -33,19 +44,18 @@ export const AuthProvider = ({ children }) => {
         await setDoc(doc(db, "user", newUser.user.uid), {
             username,
             isAdmin: false,
-            disabled: false,
             currencyPref: "EUR",
             createdAt: serverTimestamp(),
         })
         return newUser
     }
 
-    const verifyAccount = () => {
-        return sendEmailVerification(auth.currentUser)
+    const verifyAccount = async () => {
+        return await sendEmailVerification(auth.currentUser)
     }
 
-    const resetPassword = (email) => {
-        return sendPasswordResetEmail(auth, email)
+    const resetPassword = async (email) => {
+        return await sendPasswordResetEmail(auth, email)
     }
 
     const logIn = async (email, password) => {
@@ -53,8 +63,47 @@ export const AuthProvider = ({ children }) => {
         return await signInWithEmailAndPassword(auth, email, password)
     }
 
-    const logOut = () => {
-        return signOut(auth)
+    const logOut = async () => {
+        return await signOut(auth)
+    }
+
+    const updateUserEmail = async (currentPassword, newEmail) => {
+        const credential = EmailAuthProvider.credential(
+            auth.currentUser.email,
+            currentPassword
+        )
+        await reauthenticateWithCredential(auth.currentUser, credential)
+        return await updateEmail(auth.currentUser, newEmail)
+    }
+
+    const updateUsername = async (currentPassword, newUsername) => {
+        const credential = EmailAuthProvider.credential(
+            auth.currentUser.email,
+            currentPassword
+        )
+        await reauthenticateWithCredential(auth.currentUser, credential)
+        await updateDoc(doc(db, "user", auth.currentUser.uid), {
+            username: newUsername,
+        })
+        return auth.currentUser.reload()
+    }
+
+    const updateUserPassword = async (currentPassword, newPassword) => {
+        const credential = EmailAuthProvider.credential(
+            auth.currentUser.email,
+            currentPassword
+        )
+        await reauthenticateWithCredential(auth.currentUser, credential)
+        return await updatePassword(auth.currentUser, newPassword)
+    }
+
+    const deleteAccount = async (currentPassword) => {
+        const credential = EmailAuthProvider.credential(
+            auth.currentUser.email,
+            currentPassword
+        )
+        await reauthenticateWithCredential(auth.currentUser, credential)
+        return await deleteUser(auth.currentUser)
     }
 
     useEffect(() => {
@@ -87,6 +136,10 @@ export const AuthProvider = ({ children }) => {
         resetPassword,
         logIn,
         logOut,
+        updateUserEmail,
+        updateUsername,
+        updateUserPassword,
+        deleteAccount,
     }
 
     // if (loading) return <FullPageSpinner />

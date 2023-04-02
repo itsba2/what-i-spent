@@ -157,6 +157,7 @@ const Register = () => {
                                 <TextField
                                     {...field}
                                     variant="outlined"
+                                    autoComplete="new-password"
                                     type={showPassword ? "text" : "password"}
                                     InputProps={{
                                         endAdornment: (
@@ -194,6 +195,7 @@ const Register = () => {
                                 <TextField
                                     {...field}
                                     variant="outlined"
+                                    autoComplete="new-password"
                                     type={showPassword ? "text" : "password"}
                                     InputProps={{
                                         endAdornment: (
@@ -231,6 +233,7 @@ const Register = () => {
                                 <TextField
                                     {...field}
                                     variant="outlined"
+                                    autoComplete="username"
                                     required
                                     label="Username"
                                     error={!!errors.username}

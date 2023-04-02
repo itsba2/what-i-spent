@@ -34,7 +34,7 @@ export const fetchExpenses = async (userId) => {
             date: doc.data().date.seconds,
         }))
     } catch (error) {
-        return error
+        return error.code
     }
 }
 export const fetchEarnings = async (userId) => {
@@ -56,7 +56,7 @@ export const fetchEarnings = async (userId) => {
             date: doc.data().date.seconds,
         }))
     } catch (error) {
-        return error
+        return error.code
     }
 }
 
@@ -83,9 +83,9 @@ export const addExpense = async ({
             expenses: arrayUnion(newExpense.id),
         })
 
-        return { msg: "Successfully added." }
+        return { docId: newExpense.id, msg: "Successfully added." }
     } catch (error) {
-        return error
+        return error.code
     }
 }
 
@@ -112,9 +112,9 @@ export const addEarning = async ({
             earnings: arrayUnion(newEarning.id),
         })
 
-        return { msg: "Successfully added." }
+        return { docId: newEarning.id, msg: "Successfully added." }
     } catch (error) {
-        return error
+        return error.code
     }
 }
 
@@ -126,7 +126,7 @@ export const deleteExpense = async ({ userId, docId }) => {
         await deleteDoc(doc(db, "expense", docId))
         return { msg: "Successfully deleted." }
     } catch (error) {
-        return error
+        return error.code
     }
 }
 
@@ -138,6 +138,6 @@ export const deleteEarning = async (docId) => {
         await deleteDoc(doc(db, "earning", docId))
         return { msg: "Successfully deleted." }
     } catch (error) {
-        return error
+        return error.code
     }
 }
