@@ -6,12 +6,13 @@ import {
     SpeedDialIcon,
     SpeedDialAction,
     CircularProgress,
+    useMediaQuery,
+    useTheme,
 } from "@mui/material"
 import { Add as AddIcon, FilterAlt as FilterIcon } from "@mui/icons-material"
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { useAuth } from "../auth/AuthProvider"
 
-import { createSelector } from "@reduxjs/toolkit"
 import { useFetchUserExpensesQuery } from "../app/services/expenseApi"
 import { useFetchUserEarningsQuery } from "../app/services/earningApi"
 
@@ -109,27 +110,27 @@ const Transactions = () => {
         useFetchUserEarningsQuery(currentUser.id, {
             selectFromResult: ({ data, isLoading, isSuccess }) => {
                 const filteredData =
-                    data?.filter((expense) => {
+                    data?.filter((earning) => {
                         const dateAfterStartDate = dayjs
-                            .unix(expense.date)
+                            .unix(earning.date)
                             .isAfter(filterOptions.startDate)
                         const dateBeforeEndDate = dayjs
-                            .unix(expense.date)
+                            .unix(earning.date)
                             .isBefore(filterOptions.endDate)
                         const amountLargerThanMin = filterOptions.minAmount
                             .length
-                            ? parseFloat(expense.amount) >=
+                            ? parseFloat(earning.amount) >=
                               filterOptions.minAmount
                             : true
                         const amountSmallerThanMax = filterOptions.maxAmount
                             .length
-                            ? parseFloat(expense.amount) <=
+                            ? parseFloat(earning.amount) <=
                               filterOptions.maxAmount
                             : true
                         const selectedCurrency =
                             filterOptions.currency === "None"
                                 ? true
-                                : expense.currency === filterOptions.currency
+                                : earning.currency === filterOptions.currency
                         return (
                             dateAfterStartDate &&
                             dateBeforeEndDate &&
@@ -156,6 +157,9 @@ const Transactions = () => {
             },
         })
 
+    const theme = useTheme()
+    const mobileView = useMediaQuery(theme.breakpoints.down("sm"))
+
     return (
         <>
             {loadingUserExpenses && loadingUserEarnings && (
@@ -165,7 +169,8 @@ const Transactions = () => {
             )}
             <Box width="100%">
                 <Tabs
-                    variant="fullWidth"
+                    centered={!mobileView && true}
+                    variant={mobileView ? "fullWidth" : "standard"}
                     value={tabValue}
                     onChange={(event, newTabValue) => setTabValue(newTabValue)}
                 >
@@ -177,10 +182,10 @@ const Transactions = () => {
                         label="Earnings"
                         {...tabProps(1)}
                     />
-                    <Tab
+                    {/* <Tab
                         label="Summary"
                         {...tabProps(2)}
-                    />
+                    /> */}
                 </Tabs>
                 <TabTransactionPanel
                     transactions={filteredUserExpenses}
@@ -194,10 +199,10 @@ const Transactions = () => {
                     tabValue={tabValue}
                     tabIndex={1}
                 />
-                <TabSummaryPanel
+                {/* <TabSummaryPanel
                     tabValue={tabValue}
                     tabIndex={2}
-                />
+                /> */}
             </Box>
             <SpeedDial
                 ariaLabel="actions"

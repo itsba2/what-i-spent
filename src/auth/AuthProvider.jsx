@@ -120,7 +120,7 @@ export const AuthProvider = ({ children }) => {
                     })
                 } catch (error) {
                     // TODO: handle error if cannot get user from db
-                    console.log(error)
+                    console.log('auth error',error)
                 }
             } else setCurrentUser(null)
             setLoading(false)

@@ -32,3 +32,49 @@ export const resolveFirebaseError = (code) => {
     const error = errors.find((err) => err.code === code) || {}
     return error.msg ?? "Unkown error."
 }
+
+export const chartColors = {
+    onLight: [
+        "#1F77B4",
+        "#FF7F0E",
+        "#2CA02C",
+        "#D62728",
+        "#9467BD",
+        "#8C564B",
+        "#E377C2",
+        "#7F7F7F",
+        "#BCBD22",
+        "#17BECF",
+        "#9EDAE5",
+        "#FFBB78",
+        "#98DF8A",
+        "#FF9896",
+    ],
+
+    onDark: [
+        "#F5D78E",
+        "#E67E22",
+        "#7FB3D5",
+        "#6F98A8",
+        "#D5B8A9",
+        "#979C9F",
+        "#8F534B",
+        "#C0504D",
+        "#4F81BD",
+        "#9BBB59",
+        "#4BACC6",
+        "#8064A2",
+        "#C3D69B",
+        "#4E72B8",
+    ],
+}
+
+export const chunkArray = (list, chunk) => {
+    const result = []
+
+    for (let i = 0; i < list.length; i += chunk) {
+        result.push(list.slice(i, i + chunk))
+    }
+
+    return result
+}
