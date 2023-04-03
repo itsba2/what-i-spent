@@ -164,10 +164,10 @@ const Transactions = () => {
         <>
             {loadingUserExpenses && loadingUserEarnings && (
                 <CircularProgress
-                    sx={{ position: "absolute", top: "50%", bototm: "50%" }}
+                    sx={{ position: "absolute", top: "50%", left: "50%" }}
                 />
             )}
-            <Box width="100%">
+            <Box width="100%" marginBottom={2}>
                 <Tabs
                     centered={!mobileView && true}
                     variant={mobileView ? "fullWidth" : "standard"}

@@ -69,8 +69,9 @@ export const chartColors = {
     ],
 }
 
+// https://stackoverflow.com/questions/59257753/firebase-firestore-query-an-array-of-more-than-10-elements
 export const chunkArray = (list, chunk) => {
-    const result = []
+    let result = []
 
     for (let i = 0; i < list.length; i += chunk) {
         result.push(list.slice(i, i + chunk))

@@ -407,7 +407,7 @@ const AddTransaction = () => {
                         >
                             <Button
                                 variant="outlined"
-                                color="secondary"
+                                color="primary"
                                 startIcon={<CancelIcon />}
                                 onClick={() => navigate(-1)}
                             >

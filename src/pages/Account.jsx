@@ -32,6 +32,7 @@ import { useAuth } from "../auth/AuthProvider"
 import { resolveFirebaseError } from "../helpers/helpers"
 import currencies from "../helpers/currency.json"
 import { updateCurrencyPref } from "../firebase/user"
+import ToggleTheme from "../components/ToggleTheme"
 
 const initialFeedback = { type: "error", show: false, msg: "" }
 
@@ -299,6 +300,7 @@ const Account = () => {
                                         />
                                     )}
                                 />
+                                <ToggleTheme />
 
                                 <Button
                                     variant="contained"

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 
 import logo from "../../assets/what-i-spent.png"
 import BackButton from "./BackButton"
-import ToggleTheme from "./ToggleTheme"
+import ToggleTheme from "../../components/ToggleTheme"
 
 const TopBar = () => (
     <AppBar position="sticky">
@@ -37,7 +37,8 @@ const TopBar = () => (
                         WHATiSPENT
                     </Typography>
                 </Box>
-                <ToggleTheme />
+                <Box visibility="hidden"></Box>
+                {/* <ToggleTheme /> */}
             </Toolbar>
         </Container>
     </AppBar>
