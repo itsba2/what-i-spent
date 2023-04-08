@@ -14,8 +14,8 @@ const Modal = ({
   text,
   noText = "No",
   onNo = () => {},
-  yesText,
-  onYes = "Yes",
+  yesText = "Yes",
+  onYes = () => {},
 }) => {
   return (
     <Dialog open={open} onClose={() => toggle(false)}>
@@ -27,7 +27,10 @@ const Modal = ({
         <Button variant="outlined" onClick={toggle(false)}>
           {noText}
         </Button>
-        <Button variant="contained" color="primary" onClick={onYes}>
+        <Button variant="contained" color="primary" onClick={() => {
+          onYes()
+          toggle(false)
+        }}>
           {yesText}
         </Button>
       </DialogActions>

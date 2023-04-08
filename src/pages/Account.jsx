@@ -15,6 +15,11 @@ import {
   IconButton,
   InputAdornment,
   Alert,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import {
   ExpandMore as MoreIcon,
@@ -499,18 +504,29 @@ const Account = () => {
         </Box>
       )}
       {showLogoutModal && (
-        <Modal
-          open={showLogoutModal}
-          toggle={toggleLogoutModal}
-          title="Log out"
-          text="You are logging out. Are you sure?"
-          noText="Cancel"
-          yesText="OK"
-          onYes={() => {
-            logOut();
-            toggleLogoutModal(false);
-          }}
-        />
+        <Dialog open={showLogoutModal} onClose={() => toggleLogoutModal(false)}>
+          <DialogTitle>Log out</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              You are logging out. Are you sure?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button variant="outlined" onClick={() => toggleLogoutModal(false)}>
+              No
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                logOut();
+                toggleLogoutModal(false);
+              }}
+            >
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>
       )}
       <Feedback feedback={feedback} setFeedback={setFeedback} />
     </>
