@@ -319,7 +319,7 @@ const TransactionFilter = ({
                                     <Autocomplete
                                         {...field}
                                         options={[
-                                            { code: "None" },
+                                            { code: "Any" },
                                             ...currencies,
                                         ]}
                                         getOptionLabel={(option) =>
@@ -330,7 +330,7 @@ const TransactionFilter = ({
                                         }
                                         onChange={(event, option) => {
                                             field.onChange(
-                                                option?.code || "None"
+                                                option?.code || "Any"
                                             )
                                         }}
                                         renderInput={(params) => (

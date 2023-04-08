@@ -111,12 +111,12 @@ export const AuthProvider = ({ children }) => {
             if (user) {
                 try {
                     const userSnap = await getDoc(doc(db, "user", user.uid))
-                    const { expenses, earnings, ...userData } = userSnap.data()
+                    // const { expenses, earnings, ...userData } = userSnap.data()
                     setCurrentUser({
                         id: user.uid,
                         email: user.email,
                         emailVerified: user.emailVerified,
-                        ...userData,
+                        ...userSnap.data(),
                     })
                 } catch (error) {
                     // TODO: handle error if cannot get user from db
