@@ -1,47 +1,37 @@
-import { AppBar, Container, Box, Toolbar, Typography } from "@mui/material"
-import { Link } from "react-router-dom"
+import { AppBar, Container, Box, Toolbar, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 
-import logo from "../../assets/what-i-spent.png"
-import BackButton from "./BackButton"
-import ToggleTheme from "../../components/ToggleTheme"
+import logo from "../../assets/what-i-spent.png";
+import BackButton from "./BackButton";
 
 const TopBar = () => (
-    <AppBar position="sticky">
-        <Container maxWidth="lg">
-            <Toolbar
-                disableGutters
-                sx={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "space-between",
-                }}
-            >
-                <BackButton />
-                <Box
-                    display="inline-flex"
-                    alignItems="center"
-                >
-                    <Link to="/">
-                        <img
-                            src={logo}
-                            alt="Logo"
-                            style={{
-                                height: 40,
-                            }}
-                        />
-                    </Link>
-                    <Typography
-                        variant="body1"
-                        sx={{ letterSpacing: "0.2rem", ml: 1 }}
-                    >
-                        WHATiSPENT
-                    </Typography>
-                </Box>
-                <Box visibility="hidden"></Box>
-                {/* <ToggleTheme /> */}
-            </Toolbar>
-        </Container>
-    </AppBar>
-)
+  <AppBar position="sticky">
+    <Container maxWidth="lg">
+      <Toolbar
+        disableGutters
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <BackButton />
 
-export default TopBar
+        <Link to="/">
+          <img
+            src={logo}
+            alt="Logo"
+            style={{
+              width: 40,
+            }}
+          />
+        </Link>
+        <Box component="div" visibility="hidden" width={40}>
+          asd
+        </Box>
+      </Toolbar>
+    </Container>
+  </AppBar>
+);
+
+export default TopBar;

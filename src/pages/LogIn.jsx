@@ -42,7 +42,7 @@ const LogIn = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (currentUser) navigate("/", { replace: true });
+    if (currentUser) navigate("/transactions", { replace: true });
   }, [currentUser]);
 
   const [feedback, setFeedback] = useState(initialFeedback);
