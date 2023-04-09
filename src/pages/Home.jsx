@@ -50,6 +50,7 @@ const Home = () => {
         PrevIcon={<PrevIcon />}
         indicators={false}
         animation="slide"
+        navButtonsAlwaysInvisible={true}
         duration={600}
         interval={5000}
         sx={{ zIndex: 0 }}
@@ -75,7 +76,7 @@ const Item = (props) => {
             component="img"
             alt={props.item.alt}
             src={props.item.src}
-            height={400}
+            height={mobileView ? 300 : 500}
             sx={{ objectFit: "cover", objectPosition: "50% 70%" }}
           />
         </Grid>

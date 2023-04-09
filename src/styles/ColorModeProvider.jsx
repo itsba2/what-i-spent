@@ -32,7 +32,7 @@ export const ColorModeProvider = ({ children }) => {
             ? {
                 // palette values for light mode
                 primary: {
-                  main: "#00e676",
+                  main: "#388e3c",
                 },
                 secondary: {
                   main: "#ef5350",
