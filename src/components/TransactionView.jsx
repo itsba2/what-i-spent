@@ -17,6 +17,12 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
+import {
+  Close as CancelIcon,
+  Delete,
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+} from "@mui/icons-material";
 import { DatePicker } from "@mui/x-date-pickers";
 import AmountFormat from "../components/AmountFormat";
 import currencies from "../helpers/currency.json";
@@ -370,14 +376,28 @@ const TransactionView = ({ open, toggle, transaction }) => {
             )}
           />
         </DialogContent>
-        <DialogActions>
-          <Button variant="outlined" onClick={() => toggle(false)}>
+        <DialogActions sx={{ display: "flex", justifyContent: "center", px: 3, pb: 3 }}>
+          <Button
+            startIcon={<CancelIcon />}
+            variant="outlined"
+            onClick={() => toggle(false)}
+          >
             Cancel
           </Button>
-          <Button variant="outlined" color="error" onClick={handleDelete}>
+          <Button
+            startIcon={<DeleteIcon />}
+            variant="outlined"
+            color="error"
+            onClick={handleDelete}
+          >
             Delete
           </Button>
-          <Button variant="contained" color="primary" type="submit">
+          <Button
+            startIcon={<EditIcon />}
+            variant="contained"
+            color="primary"
+            type="submit"
+          >
             Edit
           </Button>
         </DialogActions>

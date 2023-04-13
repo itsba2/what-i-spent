@@ -32,20 +32,13 @@ export const ColorModeProvider = ({ children }) => {
             ? {
                 // palette values for light mode
                 primary: {
-                  main: "#388e3c",
+                  main: "#00897b",
                 },
                 secondary: {
-                  main: "#ef5350",
-                },
-                success: {
-                  main: "#388e3c",
-                },
-                info: {
-                  main: "#ffb300",
+                  main: "#f4511e",
                 },
                 background: {
-                  default: "#eeeeee",
-                  paper: "#e0e0e0",
+                  default: "#e0f2f1",
                 },
               }
             : {
@@ -54,17 +47,10 @@ export const ColorModeProvider = ({ children }) => {
                   main: "#80cbc4",
                 },
                 secondary: {
-                  main: "#ce93d8",
-                },
-                success: {
-                  main: "#2e7d32",
-                },
-                info: {
-                  main: "#fff59d",
+                  main: "#ffab91",
                 },
                 background: {
-                  default: "#212121",
-                  paper: "#353535",
+                  paper: "#212121",
                 },
               }),
         },
