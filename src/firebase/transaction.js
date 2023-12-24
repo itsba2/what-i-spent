@@ -21,7 +21,7 @@ export const fetchExpenses = async (userId) => {
   try {
     const userSnap = await getDoc(doc(db, "user", userId));
     if (!userSnap.exists()) {
-      return { msg: "No user record has been found." };
+      return { msg: "No user record was found." };
     }
     const userExpensesChunks = chunkArray(userSnap.data().expenses, 10);
     let expenseData = [];
@@ -50,7 +50,7 @@ export const fetchEarnings = async (userId) => {
   try {
     const userSnap = await getDoc(doc(db, "user", userId));
     if (!userSnap.exists()) {
-      return { msg: "No user record has been found." };
+      return { msg: "No user record was found." };
     }
     const userEarningsChunks = chunkArray(userSnap.data().earnings, 10);
     let earningData = [];
@@ -95,11 +95,11 @@ export const addExpense = async ({
       currency,
       date,
     });
+
     await updateDoc(doc(db, "user", userId), {
       expenses: arrayUnion(newExpense.id),
     });
-
-    return { docId: newExpense.id, msg: "Successfully added." };
+    return { docId: newExpense.id, msg: "Expense successfully added." };
   } catch (error) {
     return error.code;
   }
@@ -128,7 +128,7 @@ export const addEarning = async ({
       earnings: arrayUnion(newEarning.id),
     });
 
-    return { docId: newEarning.id, msg: "Successfully added." };
+    return { docId: newEarning.id, msg: "Earning successfully added." };
   } catch (error) {
     return error.code;
   }
@@ -140,7 +140,7 @@ export const deleteExpense = async ({ userId, docId }) => {
       expenses: arrayRemove(docId),
     });
     await deleteDoc(doc(db, "expense", docId));
-    return { msg: "Successfully deleted." };
+    return { msg: "Expense successfully deleted." };
   } catch (error) {
     return error.code;
   }
@@ -152,7 +152,7 @@ export const deleteEarning = async (docId) => {
       earnings: arrayRemove(docId),
     });
     await deleteDoc(doc(db, "earning", docId));
-    return { msg: "Successfully deleted." };
+    return { msg: "Earning successfully deleted." };
   } catch (error) {
     return error.code;
   }
@@ -172,7 +172,7 @@ export const updateExpense = async ({
   try {
     const userSnap = await getDoc(doc(db, "user", userId));
     if (!userSnap.exists()) {
-      return { msg: "No user record has been found." };
+      return { msg: "No user record was found." };
     }
     if (type === "earning" && userSnap.data().expenses.includes(docId)) {
       await updateDoc(doc(db, "user", userId), {
@@ -199,7 +199,7 @@ export const updateExpense = async ({
         date,
       });
     }
-    return { msg: "Successfully updated." };
+    return { msg: "Expense successfully updated." };
   } catch (error) {
     return error.code;
   }
@@ -219,7 +219,7 @@ export const updateEarning = async ({
   try {
     const userSnap = await getDoc(doc(db, "user", userId));
     if (!userSnap.exists()) {
-      return { msg: "No user record has been found." };
+      return { msg: "No user record was found." };
     }
     if (type === "expense" && userSnap.data().earnings.includes(docId)) {
       await updateDoc(doc(db, "user", userId), {
@@ -246,7 +246,7 @@ export const updateEarning = async ({
         date,
       });
     }
-    return { msg: "Successfully updated." };
+    return { msg: "Earning uccessfully updated." };
   } catch (error) {
     return error.code;
   }
