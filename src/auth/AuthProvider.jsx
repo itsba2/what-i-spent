@@ -1,152 +1,149 @@
 // library imports
-import { useContext, createContext, useEffect, useState } from "react"
+import { useContext, createContext, useEffect, useState, useMemo } from "react";
 import {
-    createUserWithEmailAndPassword,
-    onAuthStateChanged,
-    sendPasswordResetEmail,
-    sendEmailVerification,
-    signInWithEmailAndPassword,
-    signOut,
-    deleteUser,
-    updateEmail,
-    updatePassword,
-    reauthenticateWithCredential,
-    EmailAuthProvider,
-} from "firebase/auth"
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  sendEmailVerification,
+  signInWithEmailAndPassword,
+  signOut,
+  deleteUser,
+  updateEmail,
+  updatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+} from "firebase/auth";
 import {
-    getDoc,
-    doc,
-    setDoc,
-    serverTimestamp,
-    updateDoc,
-} from "firebase/firestore"
+  getDoc,
+  doc,
+  setDoc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 
 // imports from files
-import { auth, db } from "../firebase/config"
-// import FullPageSpinner from "../components/FullPageSpinner"
+import { auth, db } from "../firebase/config";
+import { useDispatch } from "react-redux";
+import { setFeedback, setLoading } from "../app/feedbackSlice";
 
-const AuthContext = createContext()
+const AuthContext = createContext();
 
 export const useAuth = () => {
-    return useContext(AuthContext)
-}
+  return useContext(AuthContext);
+};
 
 export const AuthProvider = ({ children }) => {
-    const [currentUser, setCurrentUser] = useState()
-    const [loading, setLoading] = useState(true)
+  console.log(window.indexedDB)
+  const [currentUser, setCurrentUser] = useState();
 
-    const createUser = async (email, password, username) => {
-        const newUser = await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password
-        )
-        await setDoc(doc(db, "user", newUser.user.uid), {
-            username,
-            isAdmin: false,
-            currencyPref: "EUR",
-            createdAt: serverTimestamp(),
-        })
-        return newUser
-    }
+  const dispatch = useDispatch();
 
-    const verifyAccount = async () => {
-        return await sendEmailVerification(auth.currentUser)
-    }
+  const createUser = async (email, password, username) => {
+    const newUser = await createUserWithEmailAndPassword(auth, email, password);
+    await setDoc(doc(db, "user", newUser.user.uid), {
+      username,
+      isAdmin: false,
+      currencyPref: "EUR",
+      createdAt: serverTimestamp(),
+    });
+    return newUser;
+  };
 
-    const resetPassword = async (email) => {
-        return await sendPasswordResetEmail(auth, email)
-    }
+  const verifyAccount = async () => {
+    return await sendEmailVerification(auth.currentUser);
+  };
 
-    const logIn = async (email, password) => {
-        // TODO: login with username
-        return await signInWithEmailAndPassword(auth, email, password)
-    }
+  const resetPassword = async (email) => {
+    return await sendPasswordResetEmail(auth, email);
+  };
 
-    const logOut = async () => {
-        return await signOut(auth)
-    }
+  const logIn = async (email, password) => {
+    // TODO: login with username
+    return await signInWithEmailAndPassword(auth, email, password);
+  };
 
-    const updateUserEmail = async (currentPassword, newEmail) => {
-        const credential = EmailAuthProvider.credential(
-            auth.currentUser.email,
-            currentPassword
-        )
-        await reauthenticateWithCredential(auth.currentUser, credential)
-        return await updateEmail(auth.currentUser, newEmail)
-    }
+  const logOut = async () => {
+    return await signOut(auth);
+  };
 
-    const updateUsername = async (currentPassword, newUsername) => {
-        const credential = EmailAuthProvider.credential(
-            auth.currentUser.email,
-            currentPassword
-        )
-        await reauthenticateWithCredential(auth.currentUser, credential)
-        await updateDoc(doc(db, "user", auth.currentUser.uid), {
-            username: newUsername,
-        })
-        return auth.currentUser.reload()
-    }
+  const updateUserEmail = async (currentPassword, newEmail) => {
+    const credential = EmailAuthProvider.credential(
+      auth.currentUser.email,
+      currentPassword
+    );
+    await reauthenticateWithCredential(auth.currentUser, credential);
+    return await updateEmail(auth.currentUser, newEmail);
+  };
 
-    const updateUserPassword = async (currentPassword, newPassword) => {
-        const credential = EmailAuthProvider.credential(
-            auth.currentUser.email,
-            currentPassword
-        )
-        await reauthenticateWithCredential(auth.currentUser, credential)
-        return await updatePassword(auth.currentUser, newPassword)
-    }
+  const updateUsername = async (currentPassword, newUsername) => {
+    const credential = EmailAuthProvider.credential(
+      auth.currentUser.email,
+      currentPassword
+    );
+    await reauthenticateWithCredential(auth.currentUser, credential);
+    await updateDoc(doc(db, "user", auth.currentUser.uid), {
+      username: newUsername,
+    });
+    return auth.currentUser.reload();
+  };
 
-    const deleteAccount = async (currentPassword) => {
-        const credential = EmailAuthProvider.credential(
-            auth.currentUser.email,
-            currentPassword
-        )
-        await reauthenticateWithCredential(auth.currentUser, credential)
-        return await deleteUser(auth.currentUser)
-    }
+  const updateUserPassword = async (currentPassword, newPassword) => {
+    const credential = EmailAuthProvider.credential(
+      auth.currentUser.email,
+      currentPassword
+    );
+    await reauthenticateWithCredential(auth.currentUser, credential);
+    return await updatePassword(auth.currentUser, newPassword);
+  };
 
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                try {
-                    const userSnap = await getDoc(doc(db, "user", user.uid))
-                    // const { expenses, earnings, ...userData } = userSnap.data()
-                    setCurrentUser({
-                        id: user.uid,
-                        email: user.email,
-                        emailVerified: user.emailVerified,
-                        ...userSnap.data(),
-                    })
-                } catch (error) {
-                    // TODO: handle error if cannot get user from db
-                    console.log('auth error',error)
-                }
-            } else setCurrentUser(null)
-            setLoading(false)
-        })
-        return unsubscribe
-        //eslint-disable-next-line
-    }, [])
+  const deleteAccount = async (currentPassword) => {
+    const credential = EmailAuthProvider.credential(
+      auth.currentUser.email,
+      currentPassword
+    );
+    await reauthenticateWithCredential(auth.currentUser, credential);
+    return await deleteUser(auth.currentUser);
+  };
 
-    const value = {
-        currentUser,
-        createUser,
-        verifyAccount,
-        resetPassword,
-        logIn,
-        logOut,
-        updateUserEmail,
-        updateUsername,
-        updateUserPassword,
-        deleteAccount,
-    }
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      dispatch(setLoading(true));
+      if (user) {
+        try {
+          const userSnap = await getDoc(doc(db, "user", user.uid));
+          // const { expenses, earnings, ...userData } = userSnap.data()
+          setCurrentUser({
+            id: user.uid,
+            email: user.email,
+            emailVerified: user.emailVerified,
+            ...userSnap.data(),
+          });
+        } catch (error) {
+          // TODO: handle error if cannot get user from db
+          dispatch(setFeedback({ severity: "error", message: error }));
+        }
+      } else setCurrentUser(null);
+      dispatch(setLoading(false));
+    });
+    return unsubscribe;
+    //eslint-disable-next-line
+  }, []);
 
-    // if (loading) return <FullPageSpinner />
+  const value = useMemo(
+    () => ({
+      currentUser,
+      createUser,
+      verifyAccount,
+      resetPassword,
+      logIn,
+      logOut,
+      updateUserEmail,
+      updateUsername,
+      updateUserPassword,
+      deleteAccount,
+    }),
+    [currentUser]
+  );
 
-    return (
-        <AuthContext.Provider value={value}>
-            {!loading && children}
-        </AuthContext.Provider>
-    )
-}
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
