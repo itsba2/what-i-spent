@@ -24,7 +24,8 @@ import { useEffect, useState } from "react";
 import { resolveFirebaseError } from "../helpers/helpers";
 import { useAuth } from "../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import Feedback from "../components/Feedback";
+import { useDispatch } from "react-redux";
+import { setFeedback } from "../app/feedbackSlice";
 
 const defaultValues = {
   email: "",
@@ -33,17 +34,16 @@ const defaultValues = {
   username: "",
 };
 
-const initialFeedback = { type: "error", show: false, msg: "" };
-
 const Register = () => {
   const { createUser, currentUser } = useAuth();
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (currentUser) navigate("/transactions", { replace: true });
   }, [currentUser]);
 
-  const [feedback, setFeedback] = useState(initialFeedback);
   const [showPassword, toggleShowPassword] = useState(false);
 
   const handleShowPassword = () => toggleShowPassword((prev) => !prev);
@@ -97,15 +97,21 @@ const Register = () => {
   });
 
   const onSubmit = async (data) => {
-    setFeedback(initialFeedback);
     try {
-      await createUser(data.email, data.password, data.username);
+      const res = await createUser(data.email, data.password, data.username);
+      dispatch(
+        setFeedback({
+          severity: "success",
+          message: `Successfully registered with ${res.user.email}.`,
+        })
+      );
     } catch (error) {
-      setFeedback({
-        type: "error",
-        show: true,
-        msg: resolveFirebaseError(error.code),
-      });
+      dispatch(
+        setFeedback({
+          severity: "error",
+          message: resolveFirebaseError(error.code),
+        })
+      );
     }
   };
 
@@ -242,7 +248,6 @@ const Register = () => {
           </Button>
         </CardActions>
       </Card>
-      <Feedback feedback={feedback} setFeedback={setFeedback} />
     </>
   );
 };

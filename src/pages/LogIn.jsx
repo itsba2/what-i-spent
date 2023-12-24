@@ -23,10 +23,11 @@ import {
   VisibilityOff as HideIcon,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
-import { resolveFirebaseError } from "../helpers/helpers";
 import { useAuth } from "../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import Feedback from "../components/Feedback";
+import { useDispatch } from "react-redux";
+import { setFeedback, setLoading } from "../app/feedbackSlice";
+import { resolveFirebaseError } from "../helpers/helpers";
 
 const defaultValues = {
   email: "",
@@ -35,17 +36,16 @@ const defaultValues = {
   username: "",
 };
 
-const initialFeedback = { type: "error", show: false, msg: "" };
-
 const LogIn = () => {
   const { logIn, currentUser } = useAuth();
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (currentUser) navigate("/transactions", { replace: true });
   }, [currentUser]);
 
-  const [feedback, setFeedback] = useState(initialFeedback);
   const [showPassword, toggleShowPassword] = useState(false);
 
   const handleShowPassword = () => toggleShowPassword((prev) => !prev);
@@ -69,16 +69,25 @@ const LogIn = () => {
     defaultValues,
   });
   const onSubmit = async (data) => {
-    setFeedback(initialFeedback);
+    dispatch(setLoading(true));
     try {
       await logIn(data.email, data.password, data.username);
+
+      dispatch(
+        setFeedback({
+          severity: "success",
+          message: "Successfully logged in.",
+        })
+      );
     } catch (error) {
-      setFeedback({
-        type: "error",
-        show: true,
-        msg: resolveFirebaseError(error.code),
-      });
+      dispatch(
+        setFeedback({
+          severity: "error",
+          message: resolveFirebaseError(error.code),
+        })
+      );
     }
+    dispatch(setLoading(false));
   };
 
   return (
@@ -173,7 +182,6 @@ const LogIn = () => {
           </ButtonGroup>
         </CardActions>
       </Card>
-      <Feedback feedback={feedback} setFeedback={setFeedback} />
     </>
   );
 };

@@ -17,7 +17,6 @@ import { useFetchUserExpensesQuery } from "../app/services/expenseApi";
 import { useFetchUserEarningsQuery } from "../app/services/earningApi";
 
 import TabTransactionPanel from "../components/TabTransactionPanel";
-import TabSummaryPanel from "../components/TabSummaryPanel";
 import TransactionFilter from "../components/TransactionFilter";
 import dayjs from "dayjs";
 
