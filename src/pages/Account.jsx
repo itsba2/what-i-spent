@@ -30,19 +30,19 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import zod from "zod";
 
-import Modal from "../components/Modal";
-import Feedback from "../components/Feedback";
-
 import { useAuth } from "../auth/AuthProvider";
 import { resolveFirebaseError } from "../helpers/helpers";
 import currencies from "../helpers/currency.json";
 import { updateCurrencyPref } from "../firebase/user";
 import ToggleTheme from "../components/ToggleTheme";
+import { useDispatch } from "react-redux";
+import { setFeedback, setLoading } from "../app/feedbackSlice";
 
-const initialFeedback = { type: "error", show: false, msg: "" };
 
 const Account = () => {
   const [expanded, setExpanded] = useState(false);
+
+  const dispatch = useDispatch();
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
@@ -68,7 +68,6 @@ const Account = () => {
   const [showLogoutModal, toggleLogoutModal] = useState(false);
   const [showCurrentPasswordField, toggleCurrentPasswordField] =
     useState(false);
-  const [feedback, setFeedback] = useState(initialFeedback);
 
   const theme = useTheme();
   const mobileView = useMediaQuery(theme.breakpoints.down("sm"));
@@ -77,36 +76,42 @@ const Account = () => {
   const handleVerifyAccount = () => {
     try {
       verifyAccount();
-      setFeedback({
-        type: "success",
-        show: true,
-        msg: "An email has been sent. Please check your email.",
-      });
+      dispatch(
+        setFeedback({
+          severity: "success",
+          message: "An email has been sent. Please check your email.",
+        })
+      );
     } catch (error) {
-      setFeedback({
-        type: "error",
-        show: true,
-        msg: resolveFirebaseError(error.code),
-      });
+      dispatch(
+        setFeedback({
+          severity: "error",
+          message: resolveFirebaseError(error.code),
+        })
+      );
     }
   };
 
   const handleChangeCurrencyPref = async () => {
+    dispatch(setLoading(true));
     try {
       const response = await updateCurrencyPref(currentUser.id, currencyPref);
-      setFeedback({
-        type: "success",
-        show: true,
-        msg: response.msg,
-      });
+      dispatch(
+        setFeedback({
+          severity: "success",
+          message: response.msg,
+        })
+      );
       navigate(0);
     } catch (error) {
-      setFeedback({
-        type: "error",
-        show: true,
-        msg: resolveFirebaseError(error),
-      });
+      dispatch(
+        setFeedback({
+          severity: "error",
+          message: resolveFirebaseError(error),
+        })
+      );
     }
+    dispatch(setLoading(false));
   };
 
   const [showPassword, toggleShowPassword] = useState(false);
@@ -177,7 +182,6 @@ const Account = () => {
 
   const onSubmit = async (data) => {
     let feedbackInvoked = false;
-    setFeedback(initialFeedback);
     try {
       if (data.email !== currentUser.email) {
         await updateUserEmail(data.currentPassword, data.email);
@@ -192,19 +196,21 @@ const Account = () => {
         feedbackInvoked = true;
       }
       navigate(0);
-      setFeedback({
-        type: feedbackInvoked ? "success" : "info",
-        show: true,
-        msg: feedbackInvoked
-          ? "Changes have been made successfuly."
-          : "No change has been made.",
-      });
+      dispatch(
+        setFeedback({
+          severity: feedbackInvoked ? "success" : "info",
+          message: feedbackInvoked
+            ? "Changes have been made successfuly."
+            : "No change has been made.",
+        })
+      );
     } catch (error) {
-      setFeedback({
-        type: "error",
-        show: true,
-        msg: resolveFirebaseError(error.code),
-      });
+      dispatch(
+        setFeedback({
+          severity: "error",
+          message: resolveFirebaseError(error.code),
+        })
+      );
     }
   };
 
@@ -521,6 +527,12 @@ const Account = () => {
               onClick={() => {
                 logOut();
                 toggleLogoutModal(false);
+                dispatch(
+                  setFeedback({
+                    severity: "success",
+                    message: "Successfully logged out.",
+                  })
+                );
               }}
             >
               Yes
@@ -528,7 +540,6 @@ const Account = () => {
           </DialogActions>
         </Dialog>
       )}
-      <Feedback feedback={feedback} setFeedback={setFeedback} />
     </>
   );
 };
